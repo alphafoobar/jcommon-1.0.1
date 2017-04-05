@@ -385,20 +385,20 @@ public class SpreadsheetDate extends SerialDate {
      * <P>
      * 1-Jan-1900 = 2.
      *
-     * @param d the day.
-     * @param m the month.
-     * @param y the year.
+     * @param day the day.
+     * @param month the month.
+     * @param year the year.
      * @return the serial number from the day, month and year.
      */
-    private int calcSerial(final int d, final int m, final int y) {
-        final int yy = ((y - 1900) * 365) + SerialDate.leapYearCount(y - 1);
-        int mm = SerialDate.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[m];
-        if (m > MonthConstants.FEBRUARY) {
-            if (SerialDate.isLeapYear(y)) {
+    private static int calcSerial(int day, int month, int year) {
+        final int yy = ((year - 1900) * 365) + SerialDate.leapYearCount(year - 1);
+        int mm = SerialDate.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
+        if (month > MonthConstants.FEBRUARY) {
+            if (SerialDate.isLeapYear(year)) {
                 mm = mm + 1;
             }
         }
-        return yy + mm + d + 1;
+        return yy + mm + day + 1;
     }
 
     /**
