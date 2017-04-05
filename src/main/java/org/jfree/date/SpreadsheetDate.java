@@ -87,8 +87,6 @@ public class SpreadsheetDate extends SerialDate {
     private int month;
     private int year;
 
-    private String description;
-
     /**
      * Creates a new date instance.
      *
@@ -106,7 +104,6 @@ public class SpreadsheetDate extends SerialDate {
         // the serial number needs to be synchronised with the day-month-year...
         this.serial = calcSerial(day, month, year);
 
-        this.description = toString();
     }
 
     public SpreadsheetDate(int serial) {

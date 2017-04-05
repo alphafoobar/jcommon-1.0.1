@@ -184,8 +184,48 @@ public class SerialDateTests {
     }
 
     @Test
+    public void testIsNotLeapYear1800() {
+        assertFalse(SerialDate.isLeapYear(1800));
+    }
+
+    @Test
+    public void testIsNotLeapYear2100() {
+        assertFalse(SerialDate.isLeapYear(2100));
+    }
+
+    @Test
+    public void testIsNotLeapYear2200() {
+        assertFalse(SerialDate.isLeapYear(2200));
+    }
+
+    @Test
+    public void testIsNotLeapYear2300() {
+        assertFalse(SerialDate.isLeapYear(2300));
+    }
+
+    @Test
+    public void testIsLeapYear2400() {
+        assertTrue(SerialDate.isLeapYear(2400));
+    }
+
+    @Test
     public void testIsLeapYear2000() {
         assertTrue(SerialDate.isLeapYear(2000));
+    }
+
+    @Test
+    public void testIsLeapYear1992() {
+        assertTrue(SerialDate.isLeapYear(1992));
+    }
+
+    @Test
+    public void testIsLeapYear2004() {
+        assertTrue(SerialDate.isLeapYear(2004));
+    }
+
+    @Test
+    public void testIsLeapYear2008() {
+        assertTrue(SerialDate.isLeapYear(2008));
     }
 
     @Test

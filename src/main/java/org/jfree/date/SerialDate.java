@@ -88,7 +88,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
                                             MonthConstants {
 
     /** For serialization. */
-    private static final long serialVersionUID = -293716040467423637L;
+    private static final long serialVersionUID = 0L;
     
     /** Date format symbols. */
     public static final DateFormatSymbols
@@ -379,36 +379,25 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *         year otherwise.
      */
     public static int stringToMonthCode(String s) {
-
-        final String[] shortMonthNames = DATE_FORMAT_SYMBOLS.getShortMonths();
-        final String[] monthNames = DATE_FORMAT_SYMBOLS.getMonths();
-
-        int result = -1;
-        s = s.trim();
-
+        String trimmedInput = s.trim();
         // first try parsing the string as an integer (1-12)...
         try {
-            result = Integer.parseInt(s);
-        }
-        catch (NumberFormatException e) {
+            return Integer.parseInt(trimmedInput);
+        } catch (NumberFormatException e) {
             // suppress
         }
 
+        String[] shortMonthNames = DATE_FORMAT_SYMBOLS.getShortMonths();
+        String[] monthNames = DATE_FORMAT_SYMBOLS.getMonths();
+
         // now search through the month names...
-        if ((result < 1) || (result > 12)) {
-            for (int i = 0; i < monthNames.length; i++) {
-                if (s.equals(shortMonthNames[i])) {
-                    result = i + 1;
-                    break;
-                }
-                if (s.equals(monthNames[i])) {
-                    result = i + 1;
-                    break;
-                }
+        for (int i = 0; i < monthNames.length; i++) {
+            if (shortMonthNames[i].equals(trimmedInput) || monthNames[i].equals(trimmedInput)) {
+                return i + 1;
             }
         }
 
-        return result;
+        return -1;
 
     }
 
@@ -420,8 +409,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      * @return <code>true</code> if the supplied integer code represents a 
      *         valid week-in-the-month.
      */
-    public static boolean isValidWeekInMonthCode(final int code) {
-
+    public static boolean isValidWeekInMonthCode(int code) {
         switch(code) {
             case FIRST_WEEK_IN_MONTH: 
             case SECOND_WEEK_IN_MONTH: 
@@ -436,25 +424,12 @@ public abstract class SerialDate implements Comparable<SerialDate>,
     /**
      * Determines whether or not the specified year is a leap year.
      *
-     * @param yyyy  the year (in the range 1900 to 9999).
+     * @param year  the year (in the range 1900 to 9999).
      *
      * @return <code>true</code> if the specified year is a leap year.
      */
-    public static boolean isLeapYear(final int yyyy) {
-
-        if ((yyyy % 4) != 0) {
-            return false;
-        }
-        else if ((yyyy % 400) == 0) {
-            return true;
-        }
-        else if ((yyyy % 100) == 0) {
-            return false;
-        }
-        else {
-            return true;
-        }
-
+    public static boolean isLeapYear(int year) {
+        return (year % 4) == 0 && ((year % 400) == 0 || (year % 100) != 0);
     }
 
     /**
@@ -480,23 +455,17 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      * leap years.
      *
      * @param month  the month.
-     * @param yyyy  the year (in the range 1900 to 9999).
+     * @param year  the year (in the range 1900 to 9999).
      *
      * @return the number of the last day of the month.
      */
-    public static int lastDayOfMonth(final int month, final int yyyy) {
-
-        final int result = LAST_DAY_OF_MONTH[month];
-        if (month != FEBRUARY) {
-            return result;
-        }
-        else if (isLeapYear(yyyy)) {
+    public static int lastDayOfMonth(int month, int year) {
+        int result = LAST_DAY_OF_MONTH[month];
+        if (month == FEBRUARY && isLeapYear(year)) {
             return result + 1;
         }
-        else {
-            return result;
-        }
 
+        return result;
     }
 
     /**
@@ -630,7 +599,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
         checkValidDayOfWeek(targetDOW);
 
         // find the date...
-        final int baseDOW = base.getDayOfWeek();
+        int baseDOW = base.getDayOfWeek();
         int adjust = -Math.abs(targetDOW - baseDOW);
         if (adjust >= 4) {
             adjust = 7 - adjust;
@@ -733,9 +702,9 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @return a instance of SerialDate.
      */
-    public static SerialDate createInstance(final java.util.Date date) {
+    public static SerialDate createInstance(java.util.Date date) {
 
-        final GregorianCalendar calendar = new GregorianCalendar();
+        GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         return new SpreadsheetDate(calendar.get(Calendar.DATE),
                                    calendar.get(Calendar.MONTH) + 1,
