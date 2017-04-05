@@ -495,17 +495,16 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      * <P>
      * Note that 1900 is not a leap year.
      *
-     * @param yyyy  the year (in the range 1900 to 9999).
+     * @param year  the year (in the range 1900 to 9999).
      *
      * @return the number of leap years from 1900 to the specified year.
      */
-    public static int leapYearCount(final int yyyy) {
-
-        final int leap4 = (yyyy - 1896) / 4;
-        final int leap100 = (yyyy - 1800) / 100;
-        final int leap400 = (yyyy - 1600) / 400;
+    public static int leapYearCount(int year) {
+        // TODO shouldn't this verify inputs?
+        int leap4 = (year - 1896) / 4;
+        int leap100 = (year - 1800) / 100;
+        int leap400 = (year - 1600) / 400;
         return leap4 - leap100 + leap400;
-
     }
 
     /**
