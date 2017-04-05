@@ -83,7 +83,7 @@ import java.util.GregorianCalendar;
  *
  * @author David Gilbert
  */
-public abstract class SerialDate implements Comparable, 
+public abstract class SerialDate implements Comparable<SerialDate>,
                                             Serializable, 
                                             MonthConstants {
 
@@ -203,9 +203,6 @@ public abstract class SerialDate implements Comparable,
      * date. 
      */
     public static final int FOLLOWING = 1;
-
-    /** A description for the date. */
-    private String description;
 
     /**
      * Default constructor.
@@ -588,9 +585,9 @@ public abstract class SerialDate implements Comparable,
     public static SerialDate addMonths(final int months, 
                                        final SerialDate base) {
 
-        final int yy = (12 * base.getYYYY() + base.getMonth() + months - 1) 
+        final int yy = (12 * base.getYear() + base.getMonth() + months - 1)
                        / 12;
-        final int mm = (12 * base.getYYYY() + base.getMonth() + months - 1) 
+        final int mm = (12 * base.getYear() + base.getMonth() + months - 1)
                        % 12 + 1;
         final int dd = Math.min(
             base.getDayOfMonth(), SerialDate.lastDayOfMonth(mm, yy)
@@ -610,7 +607,7 @@ public abstract class SerialDate implements Comparable,
      */
     public static SerialDate addYears(final int years, final SerialDate base) {
 
-        final int baseY = base.getYYYY();
+        final int baseY = base.getYear();
         final int baseM = base.getMonth();
         final int baseD = base.getDayOfMonth();
 
@@ -732,9 +729,9 @@ public abstract class SerialDate implements Comparable,
      */
     public SerialDate getEndOfCurrentMonth(final SerialDate base) {
         final int last = SerialDate.lastDayOfMonth(
-            base.getMonth(), base.getYYYY()
+            base.getMonth(), base.getYear()
         );
-        return SerialDate.createInstance(last, base.getMonth(), base.getYYYY());
+        return SerialDate.createInstance(last, base.getMonth(), base.getYear());
     }
 
     /**
@@ -846,35 +843,21 @@ public abstract class SerialDate implements Comparable,
      *
      * @return a description of the date.
      */
-    public String getDescription() {
-        return this.description;
-    }
+    public abstract String getDescription();
 
     /**
      * Sets the description for the date.
      *
      * @param description  the new description for the date.
      */
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    /**
-     * Converts the date to a string.
-     *
-     * @return  a string representation of the date.
-     */
-    public String toString() {
-        return getDayOfMonth() + "-" + SerialDate.monthCodeToString(getMonth())
-                               + "-" + getYYYY();
-    }
+    public abstract void setDescription(final String description);
 
     /**
      * Returns the year (assume a valid range of 1900 to 9999).
      *
      * @return the year.
      */
-    public abstract int getYYYY();
+    public abstract int getYear();
 
     /**
      * Returns the month (January = 1, February = 2, March = 3).
@@ -896,19 +879,6 @@ public abstract class SerialDate implements Comparable,
      * @return the day of the week.
      */
     public abstract int getDayOfWeek();
-
-    /**
-     * Returns the difference (in days) between this date and the specified 
-     * 'other' date.
-     * <P>
-     * The result is positive if this date is after the 'other' date and
-     * negative if it is before the 'other' date.
-     *
-     * @param other  the date being compared to.
-     *
-     * @return the difference between this and the other date.
-     */
-    public abstract int compare(SerialDate other);
 
     /**
      * Returns true if this SerialDate represents the same date as the 
@@ -1029,4 +999,13 @@ public abstract class SerialDate implements Comparable,
         return getNearestDayOfWeek(targetDOW, this);
     }
 
+    /**
+     * Converts the date to a string.
+     *
+     * @return  a string representation of the date.
+     */
+    @Override
+    public String toString() {
+        return getDayOfMonth() + "-" + SerialDate.monthCodeToString(getMonth()) + "-" + getYear();
+    }
 }

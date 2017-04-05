@@ -307,16 +307,16 @@ public class SerialDateTests extends TestCase {
         SerialDate d2 = SerialDate.addMonths(1, d1);
         assertEquals(30, d2.getDayOfMonth());
         assertEquals(6, d2.getMonth());
-        assertEquals(2004, d2.getYYYY());
+        assertEquals(2004, d2.getYear());
         
         SerialDate d3 = SerialDate.addMonths(2, d1);
         assertEquals(31, d3.getDayOfMonth());
         assertEquals(7, d3.getMonth());
-        assertEquals(2004, d3.getYYYY());
+        assertEquals(2004, d3.getYear());
         
         SerialDate d4 = SerialDate.addMonths(1, SerialDate.addMonths(1, d1));
         assertEquals(30, d4.getDayOfMonth());
         assertEquals(7, d4.getMonth());
-        assertEquals(2004, d4.getYYYY());
+        assertEquals(2004, d4.getYear());
     }
 }
