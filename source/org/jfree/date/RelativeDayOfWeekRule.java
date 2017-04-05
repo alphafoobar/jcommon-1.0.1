@@ -172,38 +172,30 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
      *         <code>null</code>).
      */
     public SerialDate getDate(final int year) {
+        checkValidYear(year);
 
-        // check argument...
+        // calculate the date...
+        SerialDate base = this.subrule.getDate(year);
+        if (base != null) {
+            switch (this.relative) {
+                case (SerialDate.PRECEDING):
+                    return SerialDate.getPreviousDayOfWeek(this.dayOfWeek, base);
+                case (SerialDate.NEAREST):
+                    return SerialDate.getNearestDayOfWeek(this.dayOfWeek, base);
+                case (SerialDate.FOLLOWING):
+                    return SerialDate.getFollowingDayOfWeek(this.dayOfWeek, base);
+            }
+        }
+        return null;
+
+    }
+
+    private void checkValidYear(int year) {
         if ((year < SerialDate.MINIMUM_YEAR_SUPPORTED)
             || (year > SerialDate.MAXIMUM_YEAR_SUPPORTED)) {
             throw new IllegalArgumentException(
                 "RelativeDayOfWeekRule.getDate(): year outside valid range.");
         }
-
-        // calculate the date...
-        SerialDate result = null;
-        final SerialDate base = this.subrule.getDate(year);
-
-        if (base != null) {
-            switch (this.relative) {
-                case(SerialDate.PRECEDING):
-                    result = SerialDate.getPreviousDayOfWeek(this.dayOfWeek, 
-                            base);
-                    break;
-                case(SerialDate.NEAREST):
-                    result = SerialDate.getNearestDayOfWeek(this.dayOfWeek, 
-                            base);
-                    break;
-                case(SerialDate.FOLLOWING):
-                    result = SerialDate.getFollowingDayOfWeek(this.dayOfWeek, 
-                            base);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return result;
-
     }
 
 }

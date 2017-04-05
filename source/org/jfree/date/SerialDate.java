@@ -219,21 +219,8 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      * @return <code>true</code> if the supplied integer code represents a 
      *         valid day-of-the-week, and <code>false</code> otherwise.
      */
-    public static boolean isValidWeekdayCode(final int code) {
-
-        switch(code) {
-            case SUNDAY: 
-            case MONDAY: 
-            case TUESDAY: 
-            case WEDNESDAY: 
-            case THURSDAY: 
-            case FRIDAY: 
-            case SATURDAY: 
-                return true;
-            default: 
-                return false;
-        }
-
+    public static boolean isValidWeekdayCode(int code) {
+        return code > 0 && code < 8;
     }
 
     /**
@@ -241,28 +228,19 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @param s  a string representing the day of the week.
      *
-     * @return <code>-1</code> if the string is not convertable, the day of 
-     *         the week otherwise.
+     * @return <code>-1</code> if the string is not convertible, the day of the week otherwise.
      */
     public static int stringToWeekdayCode(String s) {
+        String[] shortWeekdayNames = DATE_FORMAT_SYMBOLS.getShortWeekdays();
+        String[] weekDayNames = DATE_FORMAT_SYMBOLS.getWeekdays();
 
-        final String[] shortWeekdayNames 
-            = DATE_FORMAT_SYMBOLS.getShortWeekdays();
-        final String[] weekDayNames = DATE_FORMAT_SYMBOLS.getWeekdays();
-
-        int result = -1;
         s = s.trim();
         for (int i = 0; i < weekDayNames.length; i++) {
-            if (s.equals(shortWeekdayNames[i])) {
-                result = i;
-                break;
-            }
-            if (s.equals(weekDayNames[i])) {
-                result = i;
-                break;
+            if (shortWeekdayNames[i].equals(s) || weekDayNames[i].equals(s)) {
+                return i;
             }
         }
-        return result;
+        return -1;
 
     }
 
@@ -606,15 +584,12 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      * @return A new date.
      */
     public static SerialDate addYears(final int years, final SerialDate base) {
+        int baseY = base.getYear();
+        int baseM = base.getMonth();
+        int baseD = base.getDayOfMonth();
 
-        final int baseY = base.getYear();
-        final int baseM = base.getMonth();
-        final int baseD = base.getDayOfMonth();
-
-        final int targetY = baseY + years;
-        final int targetD = Math.min(
-            baseD, SerialDate.lastDayOfMonth(baseM, targetY)
-        );
+        int targetY = baseY + years;
+        int targetD = Math.min(baseD, SerialDate.lastDayOfMonth(baseM, targetY));
 
         return SerialDate.createInstance(targetD, baseM, targetY);
 
@@ -630,28 +605,20 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      * @return the latest date that falls on the specified day-of-the-week and 
      *         is BEFORE the base date.
      */
-    public static SerialDate getPreviousDayOfWeek(final int targetWeekday, 
-                                                  final SerialDate base) {
+    public static SerialDate getPreviousDayOfWeek(int targetWeekday, SerialDate base) {
+        checkValidDayOfWeek(targetWeekday);
 
-        // check arguments...
-        if (!SerialDate.isValidWeekdayCode(targetWeekday)) {
-            throw new IllegalArgumentException(
-                "Invalid day-of-the-week code."
-            );
-        }
-
-        // find the date...
-        final int adjust;
-        final int baseDOW = base.getDayOfWeek();
-        if (baseDOW > targetWeekday) {
-            adjust = Math.min(0, targetWeekday - baseDOW);
-        }
-        else {
-            adjust = -7 + Math.max(0, targetWeekday - baseDOW);
-        }
-
+        int adjust = calculateDateAdjustment(targetWeekday, base);
         return SerialDate.addDays(adjust, base);
+    }
 
+    private static int calculateDateAdjustment(int targetWeekday, SerialDate base) {
+        int baseDOW = base.getDayOfWeek();
+        int minAdjustment = Math.min(0, targetWeekday - baseDOW);
+        if (baseDOW > targetWeekday) {
+            return minAdjustment;
+        }
+        return minAdjustment - 7;
     }
 
     /**
@@ -668,11 +635,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
                                                    final SerialDate base) {
 
         // check arguments...
-        if (!SerialDate.isValidWeekdayCode(targetWeekday)) {
-            throw new IllegalArgumentException(
-                "Invalid day-of-the-week code."
-            );
-        }
+        checkValidDayOfWeek(targetWeekday);
 
         // find the date...
         final int adjust;
@@ -687,6 +650,14 @@ public abstract class SerialDate implements Comparable<SerialDate>,
         return SerialDate.addDays(adjust, base);
     }
 
+    private static void checkValidDayOfWeek(int targetWeekday) {
+        if (!SerialDate.isValidWeekdayCode(targetWeekday)) {
+            throw new IllegalArgumentException(
+                "Invalid day-of-the-week code."
+            );
+        }
+    }
+
     /**
      * Returns the date that falls on the specified day-of-the-week and is
      * CLOSEST to the base date.
@@ -699,13 +670,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      */
     public static SerialDate getNearestDayOfWeek(final int targetDOW,  
                                                  final SerialDate base) {
-
-        // check arguments...
-        if (!SerialDate.isValidWeekdayCode(targetDOW)) {
-            throw new IllegalArgumentException(
-                "Invalid day-of-the-week code."
-            );
-        }
+        checkValidDayOfWeek(targetDOW);
 
         // find the date...
         final int baseDOW = base.getDayOfWeek();

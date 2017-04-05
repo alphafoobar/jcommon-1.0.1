@@ -52,11 +52,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-
-
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.jfree.date.MonthConstants;
 import org.jfree.date.SerialDate;
 
@@ -66,32 +62,7 @@ import org.jfree.date.SerialDate;
 public class SerialDateTests extends TestCase {
 
     /** Date representing November 9. */
-    private SerialDate nov9Y2001;
-
-    /**
-     * Creates a new test case.
-     *
-     * @param name  the name.
-     */
-    public SerialDateTests(final String name) {
-        super(name);
-    }
-
-    /**
-     * Returns a test suite for the JUnit test runner.
-     *
-     * @return The test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(SerialDateTests.class);
-    }
-
-    /**
-     * Problem set up.
-     */
-    protected void setUp() {
-        this.nov9Y2001 = SerialDate.createInstance(9, MonthConstants.NOVEMBER, 2001);
-    }
+    private SerialDate nov9Y2001 = SerialDate.createInstance(9, MonthConstants.NOVEMBER, 2001);
 
     /**
      * 9 Nov 2001 plus two months should be 9 Jan 2002.
@@ -164,7 +135,6 @@ public class SerialDateTests extends TestCase {
      * result depends on the Locale so this test needs to be modified.
      */
     public void testWeekdayCodeToString() {
-
         final String test = SerialDate.weekdayCodeToString(SerialDate.SATURDAY);
         assertEquals("Saturday", test);
 
@@ -174,17 +144,33 @@ public class SerialDateTests extends TestCase {
      * Test the conversion of a string to a weekday.  Note that this test will fail if the 
      * default locale doesn't use English weekday names...devise a better test!
      */
-    public void testStringToWeekday() {
-
+    public void testStringToWeekday_Wednesday() {
         int weekday = SerialDate.stringToWeekdayCode("Wednesday");
         assertEquals(SerialDate.WEDNESDAY, weekday);
-
         weekday = SerialDate.stringToWeekdayCode(" Wednesday ");
         assertEquals(SerialDate.WEDNESDAY, weekday);
-
         weekday = SerialDate.stringToWeekdayCode("Wed");
         assertEquals(SerialDate.WEDNESDAY, weekday);
+    }
 
+    public void testStringToWeekday_Monday() {
+        assertEquals(SerialDate.MONDAY, SerialDate.stringToWeekdayCode("Monday"));
+        assertEquals(SerialDate.MONDAY, SerialDate.stringToWeekdayCode("Mon"));
+    }
+
+    public void testStringToWeekday_Tuesday() {
+        assertEquals(SerialDate.TUESDAY, SerialDate.stringToWeekdayCode("Tuesday"));
+        assertEquals(SerialDate.TUESDAY, SerialDate.stringToWeekdayCode("Tue"));
+    }
+
+    public void testStringToWeekday_Thursday() {
+        assertEquals(SerialDate.THURSDAY, SerialDate.stringToWeekdayCode("Thursday"));
+        assertEquals(SerialDate.THURSDAY, SerialDate.stringToWeekdayCode("Thu"));
+    }
+
+    public void testStringToWeekday_Sunday() {
+        assertEquals(SerialDate.SUNDAY, SerialDate.stringToWeekdayCode("Sunday"));
+        assertEquals(SerialDate.SUNDAY, SerialDate.stringToWeekdayCode("Sun"));
     }
 
     /**

@@ -1,8 +1,10 @@
-package org.jfree.date;
+package org.jfree.date.junit;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.jfree.date.MonthConstants;
+import org.jfree.date.SpreadsheetDate;
 import org.junit.Test;
 
 public class SpreadsheetDateTest {
