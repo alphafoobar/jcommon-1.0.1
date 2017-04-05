@@ -140,17 +140,9 @@ public abstract class SerialDate implements Comparable<SerialDate>,
     public static final int[] LAST_DAY_OF_MONTH =
         {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    /** The number of days in a (non-leap) year up to the end of each month. */
-    static final int[] AGGREGATE_DAYS_TO_END_OF_MONTH =
-        {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-
     /** The number of days in a year up to the end of the preceding month. */
     static final int[] AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH =
         {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-
-    /** The number of days in a leap year up to the end of each month. */
-    static final int[] LEAP_YEAR_AGGREGATE_DAYS_TO_END_OF_MONTH =
-        {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366};
 
     /** 
      * The number of days in a leap year up to the end of the preceding month. 
@@ -174,7 +166,6 @@ public abstract class SerialDate implements Comparable<SerialDate>,
     /** A useful constant for referring to the last week in a month. */
     public static final int LAST_WEEK_IN_MONTH = 0;
 
-    /** Useful range constant. */
     public static final int INCLUDE_NONE = 0;
 
     /** Useful range constant. */
@@ -260,34 +251,12 @@ public abstract class SerialDate implements Comparable<SerialDate>,
 
     }
 
-    /**
-     * Returns an array of month names.
-     *
-     * @return an array of month names.
-     */
     public static String[] getMonths() {
-
-        return getMonths(false);
-
+        return DATE_FORMAT_SYMBOLS.getMonths();
     }
 
-    /**
-     * Returns an array of month names.
-     *
-     * @param shortened  a flag indicating that shortened month names should 
-     *                   be returned.
-     *
-     * @return an array of month names.
-     */
-    public static String[] getMonths(final boolean shortened) {
-
-        if (shortened) {
-            return DATE_FORMAT_SYMBOLS.getShortMonths();
-        }
-        else {
-            return DATE_FORMAT_SYMBOLS.getMonths();
-        }
-
+    public static String[] getShortMonths() {
+        return DATE_FORMAT_SYMBOLS.getShortMonths();
     }
 
     /**
@@ -299,7 +268,6 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *         valid month.
      */
     public static boolean isValidMonthCode(final int code) {
-
         switch(code) {
             case JANUARY: 
             case FEBRUARY: 
@@ -540,11 +508,8 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @return a new date.
      */
-    public static SerialDate addDays(final int days, final SerialDate base) {
-
-        final int serialDayNumber = base.toSerial() + days;
-        return SerialDate.createInstance(serialDayNumber);
-
+    public static SerialDate addDays(int days, SerialDate base) {
+        return SerialDate.createInstance(base.toSerial() + days);
     }
 
     /**
@@ -559,17 +524,14 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @return a new date.
      */
-    public static SerialDate addMonths(final int months, 
-                                       final SerialDate base) {
+    public static SerialDate addMonths(int months, SerialDate base) {
+        int calculatedMonths = 12 * base.getYear() + base.getMonth() + months - 1;
 
-        final int yy = (12 * base.getYear() + base.getMonth() + months - 1)
-                       / 12;
-        final int mm = (12 * base.getYear() + base.getMonth() + months - 1)
-                       % 12 + 1;
-        final int dd = Math.min(
-            base.getDayOfMonth(), SerialDate.lastDayOfMonth(mm, yy)
-        );
-        return SerialDate.createInstance(dd, mm, yy);
+        int newYear = calculatedMonths / 12;
+        int newMonth = calculatedMonths % 12 + 1;
+        int newDayOfMonth =
+            Math.min(base.getDayOfMonth(), SerialDate.lastDayOfMonth(newMonth, newYear));
+        return SerialDate.createInstance(newDayOfMonth, newMonth, newYear);
 
     }
 
@@ -582,15 +544,15 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @return A new date.
      */
-    public static SerialDate addYears(final int years, final SerialDate base) {
-        int baseY = base.getYear();
-        int baseM = base.getMonth();
-        int baseD = base.getDayOfMonth();
+    public static SerialDate addYears(int years, final SerialDate base) {
+        int year = base.getYear();
+        int month = base.getMonth();
+        int dayOfMonth = base.getDayOfMonth();
 
-        int targetY = baseY + years;
-        int targetD = Math.min(baseD, SerialDate.lastDayOfMonth(baseM, targetY));
+        int newYear = year + years;
+        int newDayOfMonth = Math.min(dayOfMonth, SerialDate.lastDayOfMonth(month, newYear));
 
-        return SerialDate.createInstance(targetD, baseM, targetY);
+        return SerialDate.createInstance(newDayOfMonth, month, newYear);
 
     }
 
@@ -806,13 +768,6 @@ public abstract class SerialDate implements Comparable<SerialDate>,
     public abstract String getDescription();
 
     /**
-     * Sets the description for the date.
-     *
-     * @param description  the new description for the date.
-     */
-    public abstract void setDescription(final String description);
-
-    /**
      * Returns the year (assume a valid range of 1900 to 9999).
      *
      * @return the year.
@@ -959,11 +914,6 @@ public abstract class SerialDate implements Comparable<SerialDate>,
         return getNearestDayOfWeek(targetDOW, this);
     }
 
-    /**
-     * Converts the date to a string.
-     *
-     * @return  a string representation of the date.
-     */
     @Override
     public String toString() {
         return getDayOfMonth() + "-" + SerialDate.monthCodeToString(getMonth()) + "-" + getYear();

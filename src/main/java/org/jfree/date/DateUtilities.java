@@ -77,9 +77,6 @@ public class DateUtilities {
     }
 
     public static Date createDateFromSerialDate(SerialDate serialDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear();
-        calendar.set(serialDate.getYear(), serialDate.getMonth() - 1, serialDate.getDayOfMonth());
-        return calendar.getTime();
+        return serialDate.toDate();
     }
 }

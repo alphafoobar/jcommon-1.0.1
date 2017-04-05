@@ -242,11 +242,51 @@ public class SerialDateTests {
     }
 
     @Test
-    public void testSerial1096282() {
-        SerialDate d = SerialDate.createInstance(29, 2, 2004);
-        d = SerialDate.addYears(1, d);
+    public void testAddAYear() {
+        SerialDate serialDate = SerialDate.addYears(1, SerialDate.createInstance(29, 2, 2004));
         SerialDate expected = SerialDate.createInstance(28, 2, 2005);
-        assertTrue(d.isOn(expected));
+        assertTrue(serialDate.isOn(expected));
+        assertThat(serialDate, equalTo(expected));
+    }
+
+    @Test
+    public void testAdd0Years() {
+        SerialDate serialDate = SerialDate.addYears(0, SerialDate.createInstance(29, 2, 2004));
+        SerialDate expected = SerialDate.createInstance(29, 2, 2004);
+        assertThat(serialDate, equalTo(expected));
+        assertTrue(serialDate.isOn(expected));
+    }
+
+    @Test
+    public void testAdd12Years() {
+        SerialDate serialDate = SerialDate.addYears(12, SerialDate.createInstance(29, 2, 2004));
+        SerialDate expected = SerialDate.createInstance(29, 2, 2016);
+        assertThat(serialDate, equalTo(expected));
+        assertTrue(serialDate.isOn(expected));
+    }
+
+    @Test
+    public void testAdd2Years() {
+        SerialDate serialDate = SerialDate.addYears(2, SerialDate.createInstance(29, 2, 2004));
+        SerialDate expected = SerialDate.createInstance(28, 2, 2006);
+        assertTrue(serialDate.isOn(expected));
+        assertThat(serialDate, equalTo(expected));
+    }
+
+    @Test
+    public void testSubtract104Years() {
+        SerialDate serialDate = SerialDate.addYears(-104, SerialDate.createInstance(29, 2, 2004));
+        SerialDate expected = SerialDate.createInstance(28, 2, 1900);
+        assertTrue(serialDate.isOn(expected));
+        assertThat(serialDate, equalTo(expected));
+    }
+
+    @Test
+    public void testSubtract5Years() {
+        SerialDate serialDate = SerialDate.addYears(-5, SerialDate.createInstance(29, 2, 2004));
+        SerialDate expected = SerialDate.createInstance(28, 2, 1999);
+        assertTrue(serialDate.isOn(expected));
+        assertThat(serialDate, equalTo(expected));
     }
 
     @Test

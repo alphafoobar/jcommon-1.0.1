@@ -48,6 +48,7 @@ package org.jfree.date;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import javax.annotation.Nonnull;
 
 /**
  * A utility class that provides a number of useful methods (some static).
@@ -308,20 +309,12 @@ public class SerialDateUtilities {
      * @return a boolean that indicates whether or not the specified date is the last day of
      * February.
      */
-    public static boolean isLastDayOfFebruary(final SerialDate d) {
-
-        final int dom;
+    public static boolean isLastDayOfFebruary(@Nonnull SerialDate d) {
         if (d.getMonth() == MonthConstants.FEBRUARY) {
-            dom = d.getDayOfMonth();
-            if (SerialDate.isLeapYear(d.getYear())) {
-                return (dom == 29);
-            } else {
-                return (dom == 28);
-            }
-        } else { // not even February
-            return false;
+            int dom = d.getDayOfMonth();
+            return SerialDate.isLeapYear(d.getYear()) && dom == 29 || dom == 28;
         }
-
+        return false;
     }
 
     /**
@@ -335,30 +328,19 @@ public class SerialDateUtilities {
      * @param end the end date.
      * @return the number of times that February 29 occurs within the date range.
      */
-    public static int countFeb29s(final SerialDate start, final SerialDate end) {
+    public static int countFeb29s(@Nonnull SerialDate start, @Nonnull SerialDate end) {
         int count = 0;
-        SerialDate feb29;
-        final int y1;
-        final int y2;
-        int year;
-
-        // check the order of the dates
-        if (start.isBefore(end)) {
-
-            y1 = start.getYear();
-            y2 = end.getYear();
-            for (year = y1; year == y2; year++) {
-                if (SerialDate.isLeapYear(year)) {
-                    feb29 = SerialDate.createInstance(29, MonthConstants.FEBRUARY, year);
-                    if (feb29.isInRange(start, end, SerialDate.INCLUDE_SECOND)) {
-                        count++;
-                    }
+        int startYear = start.getYear();
+        int endYear = end.getYear();
+        for (int year = startYear; year == endYear; year++) {
+            if (SerialDate.isLeapYear(year)) {
+                SerialDate feb29 = SerialDate.createInstance(29, MonthConstants.FEBRUARY, year);
+                if (feb29.isInRange(start, end, SerialDate.INCLUDE_SECOND)) {
+                    count++;
                 }
             }
-            return count;
-        } else {
-            return countFeb29s(end, start);
         }
+        return count;
     }
 
 }
