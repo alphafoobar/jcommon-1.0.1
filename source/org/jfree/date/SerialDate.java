@@ -137,7 +137,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
     public static final int SUNDAY = Calendar.SUNDAY;
 
     /** The number of days in each month in non leap years. */
-    static final int[] LAST_DAY_OF_MONTH =
+    public static final int[] LAST_DAY_OF_MONTH =
         {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     /** The number of days in a (non-leap) year up to the end of each month. */

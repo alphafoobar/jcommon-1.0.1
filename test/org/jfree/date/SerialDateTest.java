@@ -1,4 +1,4 @@
-package org.jfree.date.junit;
+package org.jfree.date;
 
 import org.junit.Test;
 
