@@ -24,56 +24,62 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
  * in the United States and other countries.]
  *
- * ---------------------
- * DatePackageTests.java
- * ---------------------
- * (C) Copyright 2001-2003, by Object Refinery Limited.
+ * ------------------
+ * DateUtilities.java
+ * ------------------
+ * (C) Copyright 2002, 2003, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
  *
- * $Id: DatePackageTests.java,v 1.3 2005/11/16 15:58:40 taqua Exp $
+ * $Id: DateUtilities.java,v 1.4 2005/11/16 15:58:40 taqua Exp $
  *
  * Changes
  * -------
- * 16-Nov-2001 : Version 1 (DG);
- * 25-Jun-2002 : Added SerialDateUtilitiesTests (DG);
- * 24-Oct-2002 : Fixed errors reported by Checkstyle (DG);
+ * 11-Oct-2002 : Version 1 (DG);
+ * 03-Apr-2003 : Added clear() method call (DG)
  *
  */
 
 package org.jfree.date;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.util.Calendar;
+import java.util.Date;
 
-/**
- * A test suite for the <code>org.jfree.date</code> package.
- *
- */
-public class DatePackageTests extends TestCase {
+public class DateUtilities {
 
     /**
-     * Returns a test suite for the JUnit test runner.
-     *
-     * @return the test suite.
+     * @param year the year.
+     * @param month the month (1 - 12).
+     * @param day the day.
+     * @return a date.
      */
-    public static Test suite() {
-        final TestSuite suite = new TestSuite("org.jfree.date");
-        suite.addTestSuite(SerialDateTests.class);
-        suite.addTestSuite(SerialDateUtilitiesTests.class);
-        suite.addTestSuite(SpreadsheetDateTests.class);
-        return suite;
+    public static Date createDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(year, month - 1, day);
+        return calendar.getTime();
     }
 
     /**
-     * Creates a new test case.
-     *
-     * @param name  the name.
+     * @param year the year.
+     * @param month the month (1 - 12).
+     * @param day the day.
+     * @param hour the hour.
+     * @param min the minute.
+     * @return a date.
      */
-    public DatePackageTests(final String name) {
-        super(name);
+    public static Date createDate(int year, int month, int day, int hour, int min) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(year, month - 1, day, hour, min);
+        return calendar.getTime();
     }
 
+    public static Date createDateFromSerialDate(SerialDate serialDate) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(serialDate.getYear(), serialDate.getMonth() - 1, serialDate.getDayOfMonth());
+        return calendar.getTime();
+    }
 }

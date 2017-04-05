@@ -43,33 +43,13 @@
 
 package org.jfree.date;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Some tests for the SerialDateUtilities class.
  *
  */
 public class SerialDateUtilitiesTests extends TestCase {
-
-    /**
-     * Creates a new test case.
-     *
-     * @param name  the name.
-     */
-    public SerialDateUtilitiesTests(final String name) {
-        super(name);
-    }
-
-    /**
-     * Returns a test suite for the JUnit test runner.
-     *
-     * @return the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(SerialDateUtilitiesTests.class);
-    }
 
     /**
      * Problem actual day count.

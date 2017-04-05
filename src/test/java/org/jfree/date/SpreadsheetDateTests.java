@@ -64,15 +64,6 @@ public class SpreadsheetDateTests extends TestCase {
     private SerialDate s2 = new SpreadsheetDate(2);
 
     /**
-     * Creates a new test case.
-     *
-     * @param name  the name.
-     */
-    public SpreadsheetDateTests(final String name) {
-        super(name);
-    }
-
-    /**
      * 1 January 1900 is a Thursday.
      */
     public void test1Jan1900GetDayOfWeek() {

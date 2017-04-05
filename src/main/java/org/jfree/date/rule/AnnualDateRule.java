@@ -75,6 +75,7 @@ public abstract class AnnualDateRule implements Cloneable {
      *
      * @throws CloneNotSupportedException if the rule is not clonable.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
