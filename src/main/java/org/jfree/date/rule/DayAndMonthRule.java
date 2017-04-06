@@ -45,6 +45,8 @@
 
 package org.jfree.date.rule;
 
+import static org.jfree.date.SerialDateUtilities.checkValidDay;
+
 import org.jfree.date.Month;
 import org.jfree.date.SerialDate;
 import org.jfree.date.SpreadsheetDate;
@@ -60,18 +62,8 @@ import org.jfree.date.SpreadsheetDate;
  */
 public class DayAndMonthRule extends AnnualDateRule {
 
-    /** The day of the month. */
-    private int dayOfMonth;
-
-    /** The month (uses 1 to 12 in the obvious way). */
-    private int month;
-
-    /**
-     * Default constructor: builds a DayAndMonthRule for 1 January.
-     */
-    public DayAndMonthRule() {
-        this(1, Month.JANUARY.getMonthCode());
-    }
+    private final int dayOfMonth;
+    private final int month;
 
     /**
      * Standard constructor: builds a DayAndMonthRule for the given
@@ -85,9 +77,11 @@ public class DayAndMonthRule extends AnnualDateRule {
      * @param month  the month (use SerialDate.JANUARY, SerialDate.FEBRUARY etc.);
      */
     public DayAndMonthRule(int dayOfMonth, int month) {
-        // check arguments delegated to setter methods...
-        setMonth(month);
-        setDayOfMonth(dayOfMonth);
+        Month.checkValidMonth(month);
+        checkValidDay(dayOfMonth, month, 2017 /* We don't have a year */);
+
+        this.month = month;
+        this.dayOfMonth = dayOfMonth;
     }
 
     /**
@@ -97,26 +91,6 @@ public class DayAndMonthRule extends AnnualDateRule {
      */
     public int getDayOfMonth() {
         return this.dayOfMonth;
-    }
-
-    /**
-     * Sets the day-of-the-month for this rule.
-     *
-     * @param dayOfMonth  the day-of-the-month.
-     */
-    public void setDayOfMonth(final int dayOfMonth) {
-        checkValidDayOfMonth(dayOfMonth);
-
-        // make the change...
-        this.dayOfMonth = dayOfMonth;
-
-    }
-
-    private void checkValidDayOfMonth(int dayOfMonth) {
-        if (dayOfMonth < 1 || dayOfMonth > SerialDate.LAST_DAY_OF_MONTH[this.month]) {
-            throw new IllegalArgumentException(
-                "DayAndMonthRule(): dayOfMonth outside valid range.");
-        }
     }
 
     /**
@@ -130,18 +104,6 @@ public class DayAndMonthRule extends AnnualDateRule {
      */
     public int getMonth() {
         return this.month;
-    }
-
-    /**
-     * Sets the month for this rule.
-     *
-     * @param month  the month for this rule.
-     */
-    public void setMonth(int month) {
-        Month.checkValidMonth(month);
-
-        // make the change...
-        this.month = month;
     }
 
     /**

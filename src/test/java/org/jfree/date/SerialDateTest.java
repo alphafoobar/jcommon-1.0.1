@@ -12,10 +12,10 @@ public class SerialDateTest {
         assertFalse(SerialDateUtilities.isValidWeekdayCode(-11));
         assertFalse(SerialDateUtilities.isValidWeekdayCode(0));
         assertTrue(SerialDateUtilities.isValidWeekdayCode(1));
-        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDateImpl.WEDNESDAY));
-        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDateImpl.FRIDAY));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDate.WEDNESDAY));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDate.FRIDAY));
         assertTrue(SerialDateUtilities.isValidWeekdayCode(6));
-        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDateImpl.SATURDAY));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDate.SATURDAY));
         assertFalse(SerialDateUtilities.isValidWeekdayCode(13));
         assertFalse(SerialDateUtilities.isValidWeekdayCode(112));
     }

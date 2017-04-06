@@ -91,6 +91,22 @@ public class SerialDateUtilitiesTests {
         assertEquals(1, count);
     }
 
+    @Test
+    public void testDayCountFebruary30PSA() {
+        SerialDate startDate = SpreadsheetDate.createInstance(28, Month.FEBRUARY, 2002);
+        SerialDate endDate = SpreadsheetDate.createInstance(2, Month.APRIL, 2002);
+        int count = SerialDateUtilities.dayCount30PSA(startDate, endDate);
+        assertEquals(32, count);
+    }
+
+    @Test
+    public void testDayCountFebruaryLeap30PSA() {
+        SerialDate startDate = SpreadsheetDate.createInstance(29, Month.FEBRUARY, 2000);
+        SerialDate endDate = SpreadsheetDate.createInstance(2, Month.APRIL, 2000);
+        int count = SerialDateUtilities.dayCount30PSA(startDate, endDate);
+        assertEquals(32, count);
+    }
+
     /**
      * Problem 30E/360 day count.
      */

@@ -72,13 +72,13 @@ public class SerialDateUtilities {
         return serial < SERIAL_LOWER_BOUND || serial > SERIAL_UPPER_BOUND;
     }
 
-    static void checkValidDay(int day, int month, int year) {
+    public static void checkValidDay(int day, int month, int year) {
         if (isValidDay(day, month, year)) {
             throw new IllegalArgumentException("The 'day' must be valid for the calendar month.");
         }
     }
 
-    static void checkValidDayOfWeek(int targetWeekday) {
+    public static void checkValidDayOfWeek(int targetWeekday) {
         if (!isValidWeekdayCode(targetWeekday)) {
             throw new IllegalArgumentException("Invalid day-of-the-week code.");
         }
@@ -326,24 +326,16 @@ public class SerialDateUtilities {
      * @param end the end date.
      * @return the number of days between the two dates, assuming the 30/360 day-count convention.
      */
-    public static int dayCount30(final SerialDate start, final SerialDate end) {
-        final int d1;
-        final int m1;
-        final int y1;
-        final int d2;
-        final int m2;
-        final int y2;
-        if (start.isBefore(end)) {  // check the order of the dates
-            d1 = start.getDayOfMonth();
-            m1 = start.getMonth();
-            y1 = start.getYear();
-            d2 = end.getDayOfMonth();
-            m2 = end.getMonth();
-            y2 = end.getYear();
-            return 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1);
-        } else {
-            return -dayCount30(end, start);
-        }
+    public static int dayCount30(SerialDate start, SerialDate end) {
+        return simpleDayCount(start.getDayOfMonth(), start.getMonth(), start.getYear(),
+            end.getDayOfMonth(), end.getMonth(), end.getYear());
+    }
+
+    private static int simpleDayCount(int startDayOfMonth, int startMonth, int startYear,
+        int endDayOfMonth, int endMonth, int endYear) {
+        int days30 = 360 * (endYear - startYear);
+        days30 += 30 * (endMonth - startMonth);
+        return days30 + (endDayOfMonth - startDayOfMonth);
     }
 
     /**
@@ -361,31 +353,11 @@ public class SerialDateUtilities {
      * convention.
      */
     public static int dayCount30ISDA(SerialDate start, SerialDate end) {
-        int d1;
-        final int m1;
-        final int y1;
-        int d2;
-        final int m2;
-        final int y2;
-        if (start.isBefore(end)) {
-            d1 = start.getDayOfMonth();
-            m1 = start.getMonth();
-            y1 = start.getYear();
-            if (d1 == 31) {  // first ISDA adjustment
-                d1 = 30;
-            }
-            d2 = end.getDayOfMonth();
-            m2 = end.getMonth();
-            y2 = end.getYear();
-            if ((d2 == 31) && (d1 == 30)) {  // second ISDA adjustment
-                d2 = 30;
-            }
-            return 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1);
-        } else if (start.isAfter(end)) {
-            return -dayCount30ISDA(end, start);
-        } else {
-            return 0;
-        }
+        int startDayOfMonth = start.getDayOfMonth() > 30 ? 30 : start.getDayOfMonth();
+        return simpleDayCount(startDayOfMonth,
+            start.getMonth(), start.getYear(),
+            end.getDayOfMonth() > 30 && startDayOfMonth == 30 ? 30 : end.getDayOfMonth(),
+            end.getMonth(), end.getYear());
     }
 
     /**
@@ -400,36 +372,13 @@ public class SerialDateUtilities {
      * @return The number of days between the two dates, assuming the 30/360 (PSA) day-count
      * convention.
      */
-    public static int dayCount30PSA(final SerialDate start, final SerialDate end) {
-        int d1;
-        final int m1;
-        final int y1;
-        int d2;
-        final int m2;
-        final int y2;
-
-        if (start.isOnOrBefore(end)) { // check the order of the dates
-            d1 = start.getDayOfMonth();
-            m1 = start.getMonth();
-            y1 = start.getYear();
-
-            if (SerialDateUtilities.isLastDayOfFebruary(start)) {
-                d1 = 30;
-            }
-            if ((d1 == 31) || SerialDateUtilities.isLastDayOfFebruary(start)) {
-                // first PSA adjustment
-                d1 = 30;
-            }
-            d2 = end.getDayOfMonth();
-            m2 = end.getMonth();
-            y2 = end.getYear();
-            if ((d2 == 31) && (d1 == 30)) {  // second PSA adjustment
-                d2 = 30;
-            }
-            return 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1);
-        } else {
-            return -dayCount30PSA(end, start);
-        }
+    public static int dayCount30PSA(SerialDate start, SerialDate end) {
+        int startDayOfMonth =
+            SerialDateUtilities.isLastDayOfFebruary(start) ? 30 : start.getDayOfMonth();
+        return simpleDayCount(startDayOfMonth,
+            start.getMonth(), start.getYear(),
+            end.getDayOfMonth() > 30 && startDayOfMonth == 30 ? 30 : end.getDayOfMonth(),
+            end.getMonth(), end.getYear());
     }
 
     /**
@@ -446,31 +395,10 @@ public class SerialDateUtilities {
      * @return the number of days between the two dates, assuming the 30E/360 day-count convention.
      */
     public static int dayCount30E(final SerialDate start, final SerialDate end) {
-        int d1;
-        final int m1;
-        final int y1;
-        int d2;
-        final int m2;
-        final int y2;
-        if (start.isBefore(end)) {
-            d1 = start.getDayOfMonth();
-            m1 = start.getMonth();
-            y1 = start.getYear();
-            if (d1 == 31) {  // first European adjustment
-                d1 = 30;
-            }
-            d2 = end.getDayOfMonth();
-            m2 = end.getMonth();
-            y2 = end.getYear();
-            if (d2 == 31) {  // first European adjustment
-                d2 = 30;
-            }
-            return 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1);
-        } else if (start.isAfter(end)) {
-            return -dayCount30E(end, start);
-        } else {
-            return 0;
-        }
+        return simpleDayCount(start.getDayOfMonth() > 30 ? 30 : start.getDayOfMonth(),
+            start.getMonth(), start.getYear(),
+            end.getDayOfMonth() > 30 ? 30 : end.getDayOfMonth(),
+            end.getMonth(), end.getYear());
     }
 
     /**

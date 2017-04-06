@@ -1,8 +1,4 @@
-/* ========================================================================
- * JCommon : a free general purpose class library for the Java(tm) platform
- * ========================================================================
- *
- * (C) Copyright 2000-2005, by Object Refinery Limited and Contributors.
+/* (C) Copyright 2000-2005, by Object Refinery Limited.
  * 
  * Project Info:  http://www.jfree.org/jcommon/index.html
  *
@@ -19,27 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
- * USA.  
- *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
- * in the United States and other countries.]
- *
- * -------------------
- * AnnualDateRule.java
- * -------------------
- * (C) Copyright 2000-2003, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * $Id: AnnualDateRule.java,v 1.4 2005/11/16 15:58:40 taqua Exp $
- *
- * Changes (from 26-Oct-2001)
- * --------------------------
- * 26-Oct-2001 : Changed package to com.jrefinery.date.* (DG);
- * 12-Nov-2001 : Javadoc comments updated (DG);
- * 03-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- *
+ * USA.
  */
 
 package org.jfree.date.rule;
@@ -54,7 +30,7 @@ import org.jfree.date.SerialDate;
  *
  * @author David Gilbert
  */
-public abstract class AnnualDateRule implements Cloneable {
+public abstract class AnnualDateRule {
 
     /**
      * Returns the date for this rule, given the year.
@@ -64,20 +40,5 @@ public abstract class AnnualDateRule implements Cloneable {
      * @return the date for this rule, given the year.
      */
     public abstract SerialDate getDate(int year);
-
-    /**
-     * Returns a clone of the rule.
-     * <P>
-     * You should refer to the documentation of the clone() method in each
-     * subclass for exact details.
-     *
-     * @return a clone of the rule.
-     *
-     * @throws CloneNotSupportedException if the rule is not clonable.
-     */
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 
 }
