@@ -4,7 +4,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public interface SerialDate {
+public interface SerialDate extends Comparable<SerialDate> {
 
     /** Date format symbols. */
     DateFormatSymbols
@@ -112,6 +112,26 @@ public interface SerialDate {
     int FOLLOWING = 1;
 
     /**
+     * Returns the earliest date that falls on the specified day-of-the-week
+     * and is AFTER the base date.
+     *
+     * @param targetWeekday a code for the target day-of-the-week.
+     * @return the earliest date that falls on the specified day-of-the-week and is AFTER the base
+     * date.
+     */
+    SerialDate getFollowingDayOfWeek(int targetWeekday);
+
+    /**
+     * Returns the latest date that falls on the specified day-of-the-week and
+     * is BEFORE the base date.
+     *
+     * @param targetWeekday a code for the target day-of-the-week.
+     * @return the latest date that falls on the specified day-of-the-week and is BEFORE the base
+     * date.
+     */
+    SerialDate getPreviousDayOfWeek(int targetWeekday);
+
+    /**
      * Returns the serial number for the date, where 1 January 1900 = 2 (this
      * corresponds, almost, to the numbering system used in Microsoft Excel for
      * Windows and Lotus 1-2-3).
@@ -127,13 +147,6 @@ public interface SerialDate {
      * @return this as <code>java.util.Date</code>.
      */
     java.util.Date toDate();
-
-    /**
-     * Returns a description of the date.
-     *
-     * @return a description of the date.
-     */
-    String getDescription();
 
     /**
      * Returns the year (assume a valid range of 1900 to 9999).
@@ -161,7 +174,7 @@ public interface SerialDate {
      *
      * @return the day of the week.
      */
-    int getDayOfWeek();
+    int calculateDayOfWeek();
 
     /**
      * Returns true if this SerialDate represents the same date as the
@@ -244,4 +257,12 @@ public interface SerialDate {
      */
     boolean isInRange(SerialDate d1, SerialDate d2,
         int include);
+
+    SerialDate addDays(int days);
+
+    SerialDate getEndOfCurrentMonth();
+
+    SerialDate addMonths(int months);
+
+    SerialDate addYears(int years);
 }

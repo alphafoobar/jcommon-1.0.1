@@ -68,64 +68,63 @@ public class SerialDateTests {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private SerialDate nov9Y2001 = SerialDateImpl.createInstance(9, Month.NOVEMBER, 2001);
+    private SerialDate nov9Y2001 = SpreadsheetDate.createInstance(9, Month.NOVEMBER, 2001);
 
     @Test
     public void testAddMonthsTo9Nov2001() {
-        final SerialDate jan9Y2002 = SerialDateImpl.addMonths(2, this.nov9Y2001);
-        final SerialDate answer = SerialDateImpl.createInstance(9, 1, 2002);
+        final SerialDate jan9Y2002 = nov9Y2001.addMonths(2);
+        final SerialDate answer = SpreadsheetDate.createInstance(9, 1, 2002);
         assertEquals(answer, jan9Y2002);
     }
 
     @Test
     public void testAddMonthsTo5Oct2003() {
-        final SerialDate d1 = SerialDateImpl.createInstance(5, Month.OCTOBER, 2003);
-        final SerialDate d2 = SerialDateImpl.addMonths(2, d1);
-        assertEquals(d2, SerialDateImpl.createInstance(5, Month.DECEMBER, 2003));
+        SerialDate d1 = SpreadsheetDate.createInstance(5, Month.OCTOBER, 2003);
+        assertThat(d1.addMonths(2),
+            equalTo(SpreadsheetDate.createInstance(5, Month.DECEMBER, 2003)));
     }
 
     @Test
     public void testAddMonthsTo1Jan2003() {
-        final SerialDate d1 = SerialDateImpl.createInstance(1, Month.JANUARY, 2003);
-        final SerialDate d2 = SerialDateImpl.addMonths(0, d1);
-        assertEquals(d2, d1);
+        SerialDate d1 = SpreadsheetDate.createInstance(1, Month.JANUARY, 2003);
+        assertThat(d1.addMonths(0), equalTo(d1));
     }
 
     @Test
     public void testMondayPrecedingFriday9Nov2001() {
-        SerialDate mondayBefore = SerialDateImpl.getPreviousDayOfWeek(
-            SerialDateImpl.MONDAY, this.nov9Y2001
+        SerialDate mondayBefore = this.nov9Y2001.getPreviousDayOfWeek(
+            SpreadsheetDate.MONDAY
         );
         assertEquals(5, mondayBefore.getDayOfMonth());
     }
 
     @Test
     public void testMondayFollowingFriday9Nov2001() {
-        SerialDate mondayAfter = SerialDateImpl.getFollowingDayOfWeek(
-            SerialDateImpl.MONDAY, this.nov9Y2001
+        SerialDate mondayAfter = this.nov9Y2001.getFollowingDayOfWeek(
+            SpreadsheetDate.MONDAY
         );
         assertEquals(12, mondayAfter.getDayOfMonth());
     }
 
     @Test
     public void testMondayNearestFriday9Nov2001() {
-        SerialDate mondayNearest = SerialDateImpl.getNearestDayOfWeek(
-            SerialDateImpl.MONDAY, this.nov9Y2001
+        SerialDate mondayNearest = SpreadsheetDate.getNearestDayOfWeek(
+            SpreadsheetDate.MONDAY, this.nov9Y2001
         );
         assertEquals(12, mondayNearest.getDayOfMonth());
     }
 
     @Test
     public void testMondayNearest22Jan1970() {
-        SerialDate jan22Y1970 = SerialDateImpl.createInstance(22, Month.JANUARY, 1970);
+        SerialDate jan22Y1970 = SpreadsheetDate.createInstance(22, Month.JANUARY, 1970);
         SerialDate mondayNearest = SerialDateImpl
-            .getNearestDayOfWeek(SerialDateImpl.MONDAY, jan22Y1970);
+            .getNearestDayOfWeek(SpreadsheetDate.MONDAY, jan22Y1970);
         assertEquals(19, mondayNearest.getDayOfMonth());
     }
 
     @Test
     public void testWeekdayCodeToString() {
-        final String test = SerialDateUtilities.weekdayCodeToString(SerialDateImpl.SATURDAY);
+        final String test = SerialDateUtilities.weekdayCodeToString(SpreadsheetDate.SATURDAY);
         assertEquals("Saturday", test);
 
     }
@@ -133,35 +132,35 @@ public class SerialDateTests {
     @Test
     public void testStringToWeekday_Wednesday() {
         int weekday = SerialDateUtilities.stringToWeekdayCode("Wednesday");
-        assertEquals(SerialDateImpl.WEDNESDAY, weekday);
+        assertEquals(SpreadsheetDate.WEDNESDAY, weekday);
         weekday = SerialDateUtilities.stringToWeekdayCode(" Wednesday ");
-        assertEquals(SerialDateImpl.WEDNESDAY, weekday);
+        assertEquals(SpreadsheetDate.WEDNESDAY, weekday);
         weekday = SerialDateUtilities.stringToWeekdayCode("Wed");
-        assertEquals(SerialDateImpl.WEDNESDAY, weekday);
+        assertEquals(SpreadsheetDate.WEDNESDAY, weekday);
     }
 
     @Test
     public void testStringToWeekday_Monday() {
-        assertEquals(SerialDateImpl.MONDAY, SerialDateUtilities.stringToWeekdayCode("Monday"));
-        assertEquals(SerialDateImpl.MONDAY, SerialDateUtilities.stringToWeekdayCode("Mon"));
+        assertEquals(SpreadsheetDate.MONDAY, SerialDateUtilities.stringToWeekdayCode("Monday"));
+        assertEquals(SpreadsheetDate.MONDAY, SerialDateUtilities.stringToWeekdayCode("Mon"));
     }
 
     @Test
     public void testStringToWeekday_Tuesday() {
-        assertEquals(SerialDateImpl.TUESDAY, SerialDateUtilities.stringToWeekdayCode("Tuesday"));
-        assertEquals(SerialDateImpl.TUESDAY, SerialDateUtilities.stringToWeekdayCode("Tue"));
+        assertEquals(SpreadsheetDate.TUESDAY, SerialDateUtilities.stringToWeekdayCode("Tuesday"));
+        assertEquals(SpreadsheetDate.TUESDAY, SerialDateUtilities.stringToWeekdayCode("Tue"));
     }
 
     @Test
     public void testStringToWeekday_Thursday() {
-        assertEquals(SerialDateImpl.THURSDAY, SerialDateUtilities.stringToWeekdayCode("Thursday"));
-        assertEquals(SerialDateImpl.THURSDAY, SerialDateUtilities.stringToWeekdayCode("Thu"));
+        assertEquals(SpreadsheetDate.THURSDAY, SerialDateUtilities.stringToWeekdayCode("Thursday"));
+        assertEquals(SpreadsheetDate.THURSDAY, SerialDateUtilities.stringToWeekdayCode("Thu"));
     }
 
     @Test
     public void testStringToWeekday_Sunday() {
-        assertEquals(SerialDateImpl.SUNDAY, SerialDateUtilities.stringToWeekdayCode("Sunday"));
-        assertEquals(SerialDateImpl.SUNDAY, SerialDateUtilities.stringToWeekdayCode("Sun"));
+        assertEquals(SpreadsheetDate.SUNDAY, SerialDateUtilities.stringToWeekdayCode("Sunday"));
+        assertEquals(SpreadsheetDate.SUNDAY, SerialDateUtilities.stringToWeekdayCode("Sun"));
     }
 
     @Test
@@ -240,7 +239,15 @@ public class SerialDateTests {
 
     @Test
     public void testLeapYearCount1899() {
-        assertThat(SerialDateUtilities.leapYearCount(1899), equalTo(0));
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("The 'year' must be in range 1900 to");
+
+        SerialDateUtilities.leapYearCount(1899);
+    }
+
+    @Test
+    public void testLeapYearCount1900() {
+        assertThat(SerialDateUtilities.leapYearCount(1900), equalTo(0));
     }
 
     @Test
@@ -270,7 +277,7 @@ public class SerialDateTests {
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
-        SerialDate expectedDate = SerialDateImpl.createInstance(15, 4, 2000);
+        SerialDate expectedDate = SpreadsheetDate.createInstance(15, 4, 2000);
         byte[] bytes = getBytesForSerialDate(expectedDate);
 
         assertThat(getSerialDateFromBytes(bytes), equalTo(expectedDate));
@@ -293,73 +300,67 @@ public class SerialDateTests {
 
     @Test
     public void testAddAYear() {
-        SerialDate serialDate = SerialDateImpl
-            .addYears(1, SerialDateImpl.createInstance(29, 2, 2004));
-        SerialDate expected = SerialDateImpl.createInstance(28, 2, 2005);
+        SerialDate serialDate = SpreadsheetDate.createInstance(29, 2, 2004).addYears(1);
+        SerialDate expected = SpreadsheetDate.createInstance(28, 2, 2005);
         assertTrue(serialDate.isOn(expected));
         assertThat(serialDate, equalTo(expected));
     }
 
     @Test
     public void testAdd0Years() {
-        SerialDate serialDate = SerialDateImpl
-            .addYears(0, SerialDateImpl.createInstance(29, 2, 2004));
-        SerialDate expected = SerialDateImpl.createInstance(29, 2, 2004);
+        SerialDate serialDate = SpreadsheetDate.createInstance(29, 2, 2004).addYears(0);
+        SerialDate expected = SpreadsheetDate.createInstance(29, 2, 2004);
         assertThat(serialDate, equalTo(expected));
         assertTrue(serialDate.isOn(expected));
     }
 
     @Test
     public void testAdd12Years() {
-        SerialDate serialDate = SerialDateImpl
-            .addYears(12, SerialDateImpl.createInstance(29, 2, 2004));
-        SerialDate expected = SerialDateImpl.createInstance(29, 2, 2016);
+        SerialDate serialDate = SpreadsheetDate.createInstance(29, 2, 2004).addYears(12);
+        SerialDate expected = SpreadsheetDate.createInstance(29, 2, 2016);
         assertThat(serialDate, equalTo(expected));
         assertTrue(serialDate.isOn(expected));
     }
 
     @Test
     public void testAdd2Years() {
-        SerialDate serialDate = SerialDateImpl
-            .addYears(2, SerialDateImpl.createInstance(29, 2, 2004));
-        SerialDate expected = SerialDateImpl.createInstance(28, 2, 2006);
+        SerialDate serialDate = SpreadsheetDate.createInstance(29, 2, 2004).addYears(2);
+        SerialDate expected = SpreadsheetDate.createInstance(28, 2, 2006);
         assertTrue(serialDate.isOn(expected));
         assertThat(serialDate, equalTo(expected));
     }
 
     @Test
     public void testSubtract104Years() {
-        SerialDate serialDate = SerialDateImpl
-            .addYears(-104, SerialDateImpl.createInstance(29, 2, 2004));
-        SerialDate expected = SerialDateImpl.createInstance(28, 2, 1900);
+        SerialDate serialDate = SpreadsheetDate.createInstance(29, 2, 2004).addYears(-104);
+        SerialDate expected = SpreadsheetDate.createInstance(28, 2, 1900);
         assertTrue(serialDate.isOn(expected));
         assertThat(serialDate, equalTo(expected));
     }
 
     @Test
     public void testSubtract5Years() {
-        SerialDate serialDate = SerialDateImpl
-            .addYears(-5, SerialDateImpl.createInstance(29, 2, 2004));
-        SerialDate expected = SerialDateImpl.createInstance(28, 2, 1999);
+        SerialDate serialDate = SpreadsheetDate.createInstance(29, 2, 2004).addYears(-5);
+        SerialDate expected = SpreadsheetDate.createInstance(28, 2, 1999);
         assertTrue(serialDate.isOn(expected));
         assertThat(serialDate, equalTo(expected));
     }
 
     @Test
     public void testAddMonths() {
-        SerialDate d1 = SerialDateImpl.createInstance(31, 5, 2004);
+        SerialDate d1 = SpreadsheetDate.createInstance(31, 5, 2004);
 
-        SerialDate d2 = SerialDateImpl.addMonths(1, d1);
+        SerialDate d2 = d1.addMonths(1);
         assertEquals(30, d2.getDayOfMonth());
         assertEquals(6, d2.getMonth());
         assertEquals(2004, d2.getYear());
 
-        SerialDate d3 = SerialDateImpl.addMonths(2, d1);
+        SerialDate d3 = d1.addMonths(2);
         assertEquals(31, d3.getDayOfMonth());
         assertEquals(7, d3.getMonth());
         assertEquals(2004, d3.getYear());
 
-        SerialDate d4 = SerialDateImpl.addMonths(1, SerialDateImpl.addMonths(1, d1));
+        SerialDate d4 = d1.addMonths(1).addMonths(1);
         assertEquals(30, d4.getDayOfMonth());
         assertEquals(7, d4.getMonth());
         assertEquals(2004, d4.getYear());

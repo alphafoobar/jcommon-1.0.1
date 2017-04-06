@@ -181,15 +181,14 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
         if (base != null) {
             switch (this.relative) {
                 case (SerialDateImpl.PRECEDING):
-                    return SerialDateImpl.getPreviousDayOfWeek(this.dayOfWeek, base);
+                    return base.getPreviousDayOfWeek(this.dayOfWeek);
                 case (SerialDateImpl.NEAREST):
                     return SerialDateImpl.getNearestDayOfWeek(this.dayOfWeek, base);
                 case (SerialDateImpl.FOLLOWING):
-                    return SerialDateImpl.getFollowingDayOfWeek(this.dayOfWeek, base);
+                    return base.getFollowingDayOfWeek(this.dayOfWeek);
             }
         }
         return null;
-
     }
 
     private void checkValidYear(int year) {

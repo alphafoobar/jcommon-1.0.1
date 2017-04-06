@@ -48,6 +48,7 @@ package org.jfree.date.rule;
 import org.jfree.date.Month;
 import org.jfree.date.SerialDate;
 import org.jfree.date.SerialDateImpl;
+import org.jfree.date.SpreadsheetDate;
 
 /**
  * An annual date rule where the generated date always falls on the same day
@@ -153,6 +154,6 @@ public class DayAndMonthRule extends AnnualDateRule {
      */
     @Override
     public SerialDate getDate(int year) {
-        return SerialDateImpl.createInstance(dayOfMonth, month, year);
+        return SpreadsheetDate.createInstance(dayOfMonth, month, year);
     }
 }

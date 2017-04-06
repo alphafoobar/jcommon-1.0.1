@@ -19,14 +19,14 @@
  * USA.  
  *
  */
-
 package org.jfree.date;
 
 import java.util.Date;
 
-public class DateUtilities {
+public enum DateUtilities {
+    ;
 
-    public static Date createDate(int year, int month, int day) {
-        return SerialDateImpl.createInstance(day, month, year).toDate();
+    public static Date createDate(int day, int month, int year) {
+        return SpreadsheetDate.createInstance(day, Month.fromMonthCode(month), year).toDate();
     }
 }

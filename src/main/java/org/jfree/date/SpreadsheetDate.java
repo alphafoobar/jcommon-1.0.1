@@ -1,8 +1,5 @@
-/* ========================================================================
- * JCommon : a free general purpose class library for the Java(tm) platform
- * ========================================================================
- *
- * (C) Copyright 2000-2005, by Object Refinery Limited and Contributors.
+/*
+ * (C) Copyright 2000-2005, by Object Refinery Limited .
  * 
  * Project Info:  http://www.jfree.org/jcommon/index.html
  *
@@ -19,58 +16,21 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
- * USA.  
- *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
- * in the United States and other countries.]
- *
- * --------------------
- * SpreadsheetDate.java
- * --------------------
- * (C) Copyright 2000-2005, by Object Refinery Limited and Contributors.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * $Id: SpreadsheetDate.java,v 1.8 2005/11/03 09:25:39 mungady Exp $
- *
- * Changes
- * -------
- * 11-Oct-2001 : Version 1 (DG);
- * 05-Nov-2001 : Added getDescription() and setDescription() methods (DG);
- * 12-Nov-2001 : Changed name from ExcelDate.java to SpreadsheetDate.java (DG);
- *               Fixed a bug in calculating day, month and year from serial 
- *               number (DG);
- * 24-Jan-2002 : Fixed a bug in calculating the serial number from the day, 
- *               month and year.  Thanks to Trevor Hills for the report (DG);
- * 29-May-2002 : Added equals(Object) method (SourceForge ID 558850) (DG);
- * 03-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- * 13-Mar-2003 : Implemented Serializable (DG);
- * 04-Sep-2003 : Completed isInRange() methods (DG);
- * 05-Sep-2003 : Implemented Comparable (DG);
- * 21-Oct-2003 : Added hashCode() method (DG);
- *
+ * USA.
  */
-
 package org.jfree.date;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import javax.annotation.Nonnull;
 
 /**
- * Represents a date using an integer, in a similar fashion to the
- * implementation in Microsoft Excel.  The range of dates supported is
+ * Represents a date in the range of dates supported is
  * 1-Jan-1900 to 31-Dec-9999.
- * <P>
- * Be aware that there is a deliberate bug in Excel that recognises the year
- * 1900 as a leap year when in fact it is not a leap year. You can find more
- * information on the Microsoft website in article Q181370:
- * <P>
- * http://support.microsoft.com/support/kb/articles/Q181/3/70.asp
- * <P>
- * Excel uses the convention that 1-Jan-1900 = 1.  This class uses the
- * convention 1-Jan-1900 = 2.
+ *
+ * This class uses the convention 1-Jan-1900 = 2.
+ *
  * The result is that the day number in this class will be different to the
  * Excel figure for January and February 1900...but then Excel adds in an extra
  * day (29-Feb-1900 which does not actually exist!) and from that point forward
@@ -86,29 +46,18 @@ public class SpreadsheetDate extends SerialDateImpl {
     private int month;
     private int year;
 
-    public SpreadsheetDate(int day, Month month, int year) {
-        this(day, month.getMonthCode(), year);
-    }
-
-    /**
-     * Creates a new date instance.
-     *
-     * @param day the day (in the range 1 to 28/29/30/31).
-     * @param month the month (in the range 1 to 12).
-     * @param year the year (in the range 1900 to 9999).
-     */
-    public SpreadsheetDate(int day, int month, int year) {
-        SerialDateUtilities.validate(day, month, year);
+    private SpreadsheetDate(int day, Month month, int year) {
+        SerialDateUtilities.validate(day, month.getMonthCode(), year);
 
         this.year = year;
-        this.month = month;
+        this.month = month.getMonthCode();
         this.day = day;
 
         // the serial number needs to be synchronised with the day-month-year...
-        this.serial = calcSerial(day, month, year);
+        this.serial = calculateSerial(day, month.getMonthCode(), year);
     }
 
-    public SpreadsheetDate(int serial) {
+    private SpreadsheetDate(int serial) {
         SerialDateUtilities.checkValidSerial(serial);
 
         this.serial = serial;
@@ -117,35 +66,75 @@ public class SpreadsheetDate extends SerialDateImpl {
         calcDayMonthYearFromSerial();
     }
 
-    /**
-     * Returns the description that is attached to the date.  It is not
-     * required that a date have a description, but for some applications it
-     * is useful.
-     *
-     * @return The description that is attached to the date.
-     */
-    @Override
-    public String getDescription() {
-        return toString();
+    public static SerialDate createInstance(int day, int month, int year) {
+        return new SpreadsheetDate(day, Month.fromMonthCode(month), year);
     }
 
-    /**
-     * Returns the serial number for the date, where 1 January 1900 = 2
-     * (this corresponds, almost, to the numbering system used in Microsoft
-     * Excel for Windows and Lotus 1-2-3).
-     *
-     * @return The serial number of this date.
-     */
+    public static SerialDate createInstance(int day, Month month, int year) {
+        return new SpreadsheetDate(day, month, year);
+    }
+
+    public static SerialDate createInstance(int serial) {
+        return new SpreadsheetDate(serial);
+    }
+
+    public static SerialDate createInstance(Date date) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.clear();
+        calendar.setTime(date);
+        return new SpreadsheetDate(calendar.get(Calendar.DATE),
+            Month.fromCalendarMonthCode(calendar.get(Calendar.MONTH)),
+            calendar.get(Calendar.YEAR));
+    }
+
+    @Override
+    public SerialDate addDays(int days) {
+        return createInstance(toSerial() + days);
+    }
+
+    @Override
+    public SerialDate getEndOfCurrentMonth() {
+        int last = SerialDateUtilities.lastDayOfMonth(month, year);
+        return createInstance(last, Month.fromMonthCode(month), year);
+    }
+
+    @Override
+    public SerialDate addYears(int years) {
+        int newYear = year + years;
+        int newDayOfMonth = Math
+            .min(day, SerialDateUtilities.lastDayOfMonth(month, newYear));
+        return createInstance(newDayOfMonth, Month.fromMonthCode(month), newYear);
+    }
+
+    @Override
+    public SerialDate addMonths(int months) {
+        int calculatedMonths = 12 * year + month + months - 1;
+
+        int newYear = calculatedMonths / 12;
+        int newMonth = calculatedMonths % 12 + 1;
+        int newDayOfMonth =
+            Math.min(day, SerialDateUtilities.lastDayOfMonth(newMonth, newYear));
+        return createInstance(newDayOfMonth, Month.fromMonthCode(newMonth), newYear);
+    }
+
+    @Override
+    public SerialDate getFollowingDayOfWeek(int targetWeekday) {
+        SerialDateUtilities.checkValidDayOfWeek(targetWeekday);
+
+        // TODO use calculateDateAdjustment
+        // find the date...
+        int baseDOW = calculateDayOfWeek();
+        if (baseDOW > targetWeekday) {
+            return addDays(7 + Math.min(0, targetWeekday - baseDOW));
+        }
+        return addDays(Math.max(0, targetWeekday - baseDOW));
+    }
+
     @Override
     public int toSerial() {
         return this.serial;
     }
 
-    /**
-     * Returns a <code>java.util.Date</code> equivalent to this date.
-     *
-     * @return The date.
-     */
     @Override
     public Date toDate() {
         Calendar calendar = Calendar.getInstance();
@@ -154,21 +143,11 @@ public class SpreadsheetDate extends SerialDateImpl {
         return calendar.getTime();
     }
 
-    /**
-     * Returns the year (assume a valid range of 1900 to 9999).
-     *
-     * @return The year.
-     */
     @Override
     public int getYear() {
         return this.year;
     }
 
-    /**
-     * Returns the month (January = 1, February = 2, March = 3).
-     *
-     * @return The month of the year.
-     */
     @Override
     public int getMonth() {
         return this.month;
@@ -179,122 +158,46 @@ public class SpreadsheetDate extends SerialDateImpl {
         return this.day;
     }
 
-    /**
-     * Returns a code representing the day of the week.
-     * <P>
-     * The codes are defined in the {@link SerialDateImpl} class as:
-     * <code>SUNDAY</code>, <code>MONDAY</code>, <code>TUESDAY</code>,
-     * <code>WEDNESDAY</code>, <code>THURSDAY</code>, <code>FRIDAY</code>, and
-     * <code>SATURDAY</code>.
-     *
-     * @return A code representing the day of the week.
-     */
     @Override
-    public int getDayOfWeek() {
+    public int calculateDayOfWeek() {
         return (this.serial + 6) % 7 + 1;
     }
 
-    /**
-     * Implements the method required by the Comparable interface.
-     *
-     * @param other the other object (usually another SerialDate).
-     * @return A negative integer, zero, or a positive integer as this object is less than, equal
-     * to, or greater than the specified object.
-     */
     @Override
     public int compareTo(@Nonnull SerialDate other) {
         return this.serial - other.toSerial();
     }
 
-    /**
-     * Returns true if this SerialDate represents the same date as the
-     * specified SerialDate.
-     *
-     * @param other the date being compared to.
-     * @return <code>true</code> if this SerialDate represents the same date as the specified
-     * SerialDate.
-     */
     @Override
     public boolean isOn(@Nonnull SerialDate other) {
         return compareTo(other) == 0;
     }
 
-    /**
-     * Returns true if this SerialDate represents an earlier date compared to
-     * the specified SerialDate.
-     *
-     * @param other the date being compared to.
-     * @return <code>true</code> if this SerialDate represents an earlier date compared to the
-     * specified SerialDate.
-     */
     @Override
     public boolean isBefore(@Nonnull SerialDate other) {
         return compareTo(other) < 0;
     }
 
-    /**
-     * Returns true if this SerialDate represents the same date as the
-     * specified SerialDate.
-     *
-     * @param other the date being compared to.
-     * @return <code>true</code> if this SerialDate represents the same date as the specified
-     * SerialDate.
-     */
     @Override
     public boolean isOnOrBefore(@Nonnull SerialDate other) {
         return compareTo(other) <= 0;
     }
 
-    /**
-     * Returns true if this SerialDate represents the same date as the
-     * specified SerialDate.
-     *
-     * @param other the date being compared to.
-     * @return <code>true</code> if this SerialDate represents the same date as the specified
-     * SerialDate.
-     */
     @Override
     public boolean isAfter(@Nonnull SerialDate other) {
         return compareTo(other) > 0;
     }
 
-    /**
-     * Returns true if this SerialDate represents the same date as the
-     * specified SerialDate.
-     *
-     * @param other the date being compared to.
-     * @return <code>true</code> if this SerialDate represents the same date as the specified
-     * SerialDate.
-     */
     @Override
     public boolean isOnOrAfter(@Nonnull SerialDate other) {
         return compareTo(other) >= 0;
     }
 
-    /**
-     * Returns <code>true</code> if this {@link SerialDateImpl} is within the
-     * specified range (INCLUSIVE).
-     *
-     * @param dateFrom a boundary date for the range.
-     * @param dateTo the other boundary date for the range.
-     * @return A boolean.
-     */
     @Override
     public boolean isInRange(@Nonnull SerialDate dateFrom, @Nonnull SerialDate dateTo) {
         return isInRange(dateFrom, dateTo, SerialDateImpl.INCLUDE_BOTH);
     }
 
-    /**
-     * Returns true if this SerialDate is within the specified range (caller
-     * specifies whether or not the end-points are included).  The order of dateFrom
-     * and dateTo is not important.
-     *
-     * @param dateFrom one boundary date for the range.
-     * @param dateTo a second boundary date for the range.
-     * @param inclusionRule a code that controls whether or not the start and end dates are included in
-     * the range.
-     * @return <code>true</code> if this SerialDate is within the specified range.
-     */
     @Override
     public boolean isInRange(@Nonnull SerialDate dateFrom, @Nonnull SerialDate dateTo,
         int inclusionRule) {
@@ -316,40 +219,39 @@ public class SpreadsheetDate extends SerialDateImpl {
         return serial > start && serial < end;
     }
 
-    /**
-     * Calculate the serial number from the day, month and year.
-     * <P>
-     * 1-Jan-1900 = 2.
-     *
-     * @param day the day.
-     * @param month the month.
-     * @param year the year.
-     * @return the serial number from the day, month and year.
-     */
-    private static int calcSerial(int day, int month, int year) {
-        int yy = ((year - 1900) * 365) + SerialDateUtilities.leapYearCount(year - 1);
-        int mm = SerialDateImpl.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
-        if (month > Month.FEBRUARY.getMonthCode()) {
-            if (SerialDateUtilities.isLeapYear(year)) {
-                mm = mm + 1;
-            }
-        }
-        return yy + mm + day + 1;
+    private static int calculateSerial(int day, int month, int year) {
+        int daysTillYear = calculateDaysIgnoringLeapYears(year);
+        int aggregatedDays = calculateAggregatedDays(month, year);
+        return daysTillYear + aggregatedDays + day + 1;
     }
 
-    /**
-     * Calculate the day, month and year from the serial number.
-     */
+    private static int calculateAggregatedDays(int month, int year) {
+        int aggregatedDays = SerialDateImpl.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
+        if (month > Month.FEBRUARY.getMonthCode() && SerialDateUtilities.isLeapYear(year)) {
+            aggregatedDays = aggregatedDays + 1;
+        }
+        return aggregatedDays;
+    }
+
+    private static int calculateDaysIgnoringLeapYears(int year) {
+        int daysSinceMinimumYear = (year - MINIMUM_YEAR_SUPPORTED) * 365;
+        return daysSinceMinimumYear + SerialDateUtilities
+            .leapYearCount(year > MINIMUM_YEAR_SUPPORTED ? year - 1 : MINIMUM_YEAR_SUPPORTED);
+    }
+
+    private static int calculateYearIgnoringLeapYears(int days) {
+        return MINIMUM_YEAR_SUPPORTED + (days / 365);
+    }
+
     private void calcDayMonthYearFromSerial() {
         // get the year from the serial date
-        final int days = this.serial - SERIAL_LOWER_BOUND;
+        int days = this.serial - SERIAL_LOWER_BOUND;
 
         setYearFromSerialDays(days);
 
-        final int ss2 = calcSerial(1, 1, this.year);
+        int ss2 = calculateSerial(1, 1, this.year);
 
         int[] daysToEndOfPrecedingMonth = AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH;
-
         if (SerialDateUtilities.isLeapYear(this.year)) {
             daysToEndOfPrecedingMonth = LEAP_YEAR_AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH;
         }
@@ -375,18 +277,14 @@ public class SpreadsheetDate extends SerialDateImpl {
         if (yearWithOverEstimatedLeapYears == yearIgnoringLeapYears) {
             this.year = yearWithOverEstimatedLeapYears;
         } else {
-            int ss1 = calcSerial(1, 1, yearWithOverEstimatedLeapYears);
+            int ss1 = calculateSerial(1, 1, yearWithOverEstimatedLeapYears);
             while (ss1 <= this.serial) {
                 yearWithOverEstimatedLeapYears = yearWithOverEstimatedLeapYears + 1;
-                ss1 = calcSerial(1, 1, yearWithOverEstimatedLeapYears);
+                ss1 = calculateSerial(1, 1, yearWithOverEstimatedLeapYears);
             }
 
             this.year = yearWithOverEstimatedLeapYears - 1;
         }
-    }
-
-    private int calculateYearIgnoringLeapYears(int days) {
-        return 1900 + (days / 365);
     }
 
     @Override
@@ -398,7 +296,7 @@ public class SpreadsheetDate extends SerialDateImpl {
     public boolean equals(Object object) {
         if (object instanceof SpreadsheetDate) {
             SpreadsheetDate s = (SpreadsheetDate) object;
-            return (s.serial == serial);
+            return s.serial == serial;
         }
         return false;
     }

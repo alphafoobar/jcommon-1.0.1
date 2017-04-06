@@ -11,7 +11,7 @@ public class DateUtilitiesTest {
     @Test
     public void createDate() throws Exception {
         Calendar calendar = createCalendar(2017, Calendar.APRIL, 7);
-        assertThat(DateUtilities.createDate(2017, Month.APRIL.getMonthCode(), 7),
+        assertThat(DateUtilities.createDate(7, Month.APRIL.getMonthCode(), 2017),
             equalTo(calendar.getTime()));
     }
 

@@ -43,31 +43,61 @@
 
 package org.jfree.date;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.Date;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests for the SpreadsheetDate class.
- *
  */
 public class SpreadsheetDateTests extends TestCase {
 
-    /** Date representing 1 January 1900. */
-    private SerialDate jan1Y1900 = new SpreadsheetDate(1, Month.JANUARY, 1900);
+    /**
+     * Date representing 1 January 1900.
+     */
+    private SerialDate jan1Y1900 = SpreadsheetDate.createInstance(1, Month.JANUARY, 1900);
 
-    /** Date representing serial day number 2. */
-    private SerialDate s2 = new SpreadsheetDate(2);
+    /**
+     * Date representing serial day number 2.
+     */
+    private SerialDate serialInstanceOf2 = SpreadsheetDate.createInstance(2);
+
+    @Test
+    public void test1Jan1900LastDayOfTheMonth() {
+        SerialDate endOfTheMonth = jan1Y1900.getEndOfCurrentMonth();
+        assertThat(endOfTheMonth, equalTo(SpreadsheetDate.createInstance(31, Month.JANUARY, 1900)));
+    }
+
+    @Test
+    public void test7AprilLastDayOfTheMonth() {
+        SerialDate endOfTheMonth = SpreadsheetDate.createInstance(7, Month.APRIL, 2017)
+            .getEndOfCurrentMonth();
+        assertThat(endOfTheMonth, equalTo(SpreadsheetDate.createInstance(30, Month.APRIL, 2017)));
+    }
+
+    @Test
+    public void test1FebLastDayOfTheMonth() {
+        SerialDate endOfTheMonth = SpreadsheetDate.createInstance(1, Month.FEBRUARY, 2000)
+            .getEndOfCurrentMonth();
+        assertThat(endOfTheMonth,
+            equalTo(SpreadsheetDate.createInstance(29, Month.FEBRUARY, 2000)));
+    }
 
     /**
      * 1 January 1900 is a Thursday.
      */
     public void test1Jan1900GetDayOfWeek() {
-        int dayOfWeek = this.jan1Y1900.getDayOfWeek();
+        int dayOfWeek = this.jan1Y1900.calculateDayOfWeek();
         assertEquals(SerialDateImpl.MONDAY, dayOfWeek);
     }
 
@@ -75,8 +105,8 @@ public class SpreadsheetDateTests extends TestCase {
      * 12 November 2001 is a Monday.
      */
     public void test12Nov2001GetDayOfWeek() {
-        final SerialDate nov12Y2001 = new SpreadsheetDate(12, Month.NOVEMBER, 2001);
-        final int dayOfWeek = nov12Y2001.getDayOfWeek();
+        final SerialDate nov12Y2001 = SpreadsheetDate.createInstance(12, Month.NOVEMBER, 2001);
+        final int dayOfWeek = nov12Y2001.calculateDayOfWeek();
         assertEquals(SerialDateImpl.MONDAY, dayOfWeek);
     }
 
@@ -84,7 +114,7 @@ public class SpreadsheetDateTests extends TestCase {
      * Day 2 is the first of the month.
      */
     public void testS2GetDayOfMonth() {
-        final int dayOfMonth = this.s2.getDayOfMonth();
+        final int dayOfMonth = this.serialInstanceOf2.getDayOfMonth();
         assertEquals(1, dayOfMonth);
     }
 
@@ -92,7 +122,7 @@ public class SpreadsheetDateTests extends TestCase {
      * Day 2 is in January.
      */
     public void testS2GetMonth() {
-        final int month = this.s2.getMonth();
+        final int month = this.serialInstanceOf2.getMonth();
         assertEquals(Month.JANUARY.getMonthCode(), month);
     }
 
@@ -100,7 +130,7 @@ public class SpreadsheetDateTests extends TestCase {
      * Day 2 is in 1900.
      */
     public void testS2GetYYYY() {
-        final int year = this.s2.getYear();
+        int year = this.serialInstanceOf2.getYear();
         assertEquals(1900, year);
     }
 
@@ -108,63 +138,68 @@ public class SpreadsheetDateTests extends TestCase {
      * Day 37986 is 31 Dec 2003.
      */
     public void test37986() {
-        final SpreadsheetDate d = new SpreadsheetDate(37986);
-        checkExpectedDate(d, 31, Month.DECEMBER, 2003);
+        SerialDate date = SpreadsheetDate.createInstance(37986);
+        checkExpectedDate(date, 31, Month.DECEMBER, 2003);
     }
 
     /**
      * Day 37987 is 1 Jan 2004.
      */
     public void test37987() {
-        final SpreadsheetDate d = new SpreadsheetDate(37987);
-        checkExpectedDate(d, 1, Month.JANUARY, 2004);
+        SerialDate date = SpreadsheetDate.createInstance(37987);
+        checkExpectedDate(date, 1, Month.JANUARY, 2004);
     }
 
     /**
      * Day 38352 is 31 Dec 2004.
      */
     public void test38352() {
-        final SpreadsheetDate d = new SpreadsheetDate(38352);
-        checkExpectedDate(d, 31, Month.DECEMBER, 2004);
+        SerialDate date = SpreadsheetDate.createInstance(38352);
+        checkExpectedDate(date, 31, Month.DECEMBER, 2004);
     }
 
     /**
      * Day 38353 is 1 Jan 2005.
      */
     public void test38353() {
-        final SpreadsheetDate d = new SpreadsheetDate(38353);
-        checkExpectedDate(d, 1, Month.JANUARY, 2005);
+        SerialDate date = SpreadsheetDate.createInstance(38353);
+        checkExpectedDate(date, 1, Month.JANUARY, 2005);
     }
 
     /**
      * Create a date for serial number 36584: it should be 28-Feb-2000.
      */
     public void test36584() {
-        final SpreadsheetDate d = new SpreadsheetDate(36584);
-        checkExpectedDate(d, 28, Month.FEBRUARY, 2000);
+        SerialDate date = SpreadsheetDate.createInstance(36584);
+        checkExpectedDate(date, 28, Month.FEBRUARY, 2000);
     }
 
     /**
      * Create a date for serial number 36585: it should be 29-Feb-2000.
      */
     public void test36585() {
-        final SpreadsheetDate d = new SpreadsheetDate(36585);
-        checkExpectedDate(d, 29, Month.FEBRUARY, 2000);
+        SerialDate date = SpreadsheetDate.createInstance(36585);
+        checkExpectedDate(date, 29, Month.FEBRUARY, 2000);
     }
 
-    private void checkExpectedDate(SpreadsheetDate d, int expectedDay, Month expectedMonth,
+    private void checkExpectedDate(SerialDate d, int expectedDay, Month expectedMonth,
         int expectedYear) {
         assertEquals(expectedDay, d.getDayOfMonth());
         assertEquals(expectedMonth.getMonthCode(), d.getMonth());
         assertEquals(expectedYear, d.getYear());
     }
 
-    /**
-     * Create a date for serial number 36586: it should be 1-Mar-2000.
-     */
+    @Test
+    public void testCreateFromDate() {
+        Date testDate = DateUtilities.createDate(29, 2, 2004);
+        SerialDate date = SpreadsheetDate.createInstance(testDate);
+        checkExpectedDate(date, 29, Month.FEBRUARY, 2004);
+    }
+
+
     public void test36586() {
-        final SpreadsheetDate d = new SpreadsheetDate(36586);
-        checkExpectedDate(d, 1, Month.MARCH, 2000);
+        SerialDate date = SpreadsheetDate.createInstance(36586);
+        checkExpectedDate(date, 1, Month.MARCH, 2000);
     }
 
     /**
@@ -179,97 +214,95 @@ public class SpreadsheetDateTests extends TestCase {
      * Create a date for 28-Feb-1900: the serial number should be 60.
      */
     public void test28Feb1900ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(28, Month.FEBRUARY, 1900);
-        assertEquals(60, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(28, Month.FEBRUARY, 1900);
+        assertEquals(60, date.toSerial());
     }
 
     /**
      * Create a date for 01-Mar-1900: the serial number should be 61.
      */
     public void test01Mar1900ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(1, Month.MARCH, 1900);
-        assertEquals(61, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(1, Month.MARCH, 1900);
+        assertEquals(61, date.toSerial());
     }
 
     /**
      * Create a date for 31-Dec-1999: the serial number should be 36525.
      */
     public void test31Dec1999ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(31, Month.DECEMBER, 1999);
-        assertEquals(36525, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(31, Month.DECEMBER, 1999);
+        assertEquals(36525, date.toSerial());
     }
 
     /**
      * Create a date for 1-Jan-2000: the serial number should be 36526.
      */
     public void test01Jan2000ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(1, Month.JANUARY, 2000);
-        assertEquals(36526, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(1, Month.JANUARY, 2000);
+        assertEquals(36526, date.toSerial());
     }
 
     /**
      * Create a date for 31-Jan-2000: the serial number should be 36556.
      */
     public void test31Jan2000ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(31, Month.JANUARY, 2000);
-        assertEquals(36556, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(31, Month.JANUARY, 2000);
+        assertEquals(36556, date.toSerial());
     }
 
     /**
      * Create a date for 01-Feb-2000: the serial number should be 36557.
      */
     public void test01Feb2000ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(1, Month.FEBRUARY, 2000);
-        assertEquals(36557, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(1, Month.FEBRUARY, 2000);
+        assertEquals(36557, date.toSerial());
     }
 
     /**
      * Create a date for 28-Feb-2000: the serial number should be 36584.
      */
     public void test28Feb2000ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(28, Month.FEBRUARY, 2000);
-        assertEquals(36584, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(28, Month.FEBRUARY, 2000);
+        assertEquals(36584, date.toSerial());
     }
 
     /**
      * Create a date for 29-Feb-2000: the serial number should be 36585.
      */
     public void test29feb2000ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(29, Month.FEBRUARY, 2000);
-        assertEquals(36585, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(29, Month.FEBRUARY, 2000);
+        assertEquals(36585, date.toSerial());
     }
 
     /**
      * Create a date for 1-Mar-2000: the serial number should be 36586.
      */
     public void test1mar2000ToSerial() {
-        final SpreadsheetDate d = new SpreadsheetDate(1, Month.MARCH, 2000);
-        assertEquals(36586, d.toSerial());
+        SerialDate date = SpreadsheetDate.createInstance(1, Month.MARCH, 2000);
+        assertEquals(36586, date.toSerial());
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
-    public void testSerialization() {
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        SerialDate expectedDate = SpreadsheetDate.createInstance(15, 4, 2000);
+        byte[] bytes = getBytesForSerialDate(expectedDate);
 
-        final SpreadsheetDate d1 = new SpreadsheetDate(15, 4, 2000);
-        SpreadsheetDate d2 = null;
+        assertThat(getSerialDateFromBytes(bytes), equalTo(expectedDate));
+    }
 
-        try {
-            final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            final ObjectOutput out = new ObjectOutputStream(buffer);
-            out.writeObject(d1);
-            out.close();
-
-            final ObjectInput in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
-            d2 = (SpreadsheetDate) in.readObject();
-            in.close();
+    private SerialDate getSerialDateFromBytes(byte[] bytes)
+        throws IOException, ClassNotFoundException {
+        try (ObjectInput in = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
+            return (SerialDate) in.readObject();
         }
-        catch (Exception e) {
-            System.out.println(e.toString());
-        }
-        assertEquals(d1, d2);
+    }
 
+    private byte[] getBytesForSerialDate(SerialDate expectedDate) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (ObjectOutput out = new ObjectOutputStream(buffer)) {
+            out.writeObject(expectedDate);
+        }
+        return buffer.toByteArray();
     }
 
 }

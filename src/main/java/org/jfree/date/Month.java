@@ -16,8 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
- * USA.  
- *
+ * USA.
  */
 package org.jfree.date;
 
@@ -57,12 +56,6 @@ public enum Month {
         return longName;
     }
 
-    /**
-     * Returns the quarter for the specified month.
-     *
-     * @param code the month code (1-12).
-     * @return the quarter that the month belongs to.
-     */
     public static int monthCodeToQuarter(int code) {
         checkValidMonth(code);
         if (code % 3 == 0) {
@@ -95,9 +88,6 @@ public enum Month {
         return fromMonthCode(calendarMonthCode + 1);
     }
 
-    /**
-     * @return {@code true} if a valid month.
-     */
     public static boolean isValidMonth(int month) {
         return month >= Month.JANUARY.getMonthCode() && month <= Month.DECEMBER.getMonthCode();
     }

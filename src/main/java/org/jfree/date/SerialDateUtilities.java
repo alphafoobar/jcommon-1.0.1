@@ -1,8 +1,5 @@
-/* ========================================================================
- * JCommon : a free general purpose class library for the Java(tm) platform
- * ========================================================================
- *
- * (C) Copyright 2000-2005, by Object Refinery Limited and Contributors.
+/*
+ * (C) Copyright 2000-2005, by Object Refinery Limited.
  * 
  * Project Info:  http://www.jfree.org/jcommon/index.html
  *
@@ -19,34 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
- * USA.  
- *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
- * in the United States and other countries.]
- *
- * ------------------------
- * SerialDateUtilities.java
- * ------------------------
- * (C) Copyright 2001-2003, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * $Id: SerialDateUtilities.java,v 1.6 2005/11/16 15:58:40 taqua Exp $
- *
- * Changes (from 26-Oct-2001)
- * --------------------------
- * 26-Oct-2001 : Changed package to com.jrefinery.date.*;
- * 08-Dec-2001 : Dropped isLeapYear() method (DG);
- * 04-Mar-2002 : Renamed SerialDates.java --> SerialDateUtilities.java (DG);
- * 25-Jun-2002 : Fixed a bug in the dayCountActual() method (DG);
- * 03-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- *
+ * USA.
  */
-
 package org.jfree.date;
 
 import static org.jfree.date.Month.FEBRUARY;
+import static org.jfree.date.SerialDate.DATE_FORMAT_SYMBOLS;
+import static org.jfree.date.SerialDate.MAXIMUM_YEAR_SUPPORTED;
+import static org.jfree.date.SerialDate.MINIMUM_YEAR_SUPPORTED;
+import static org.jfree.date.SerialDate.SERIAL_LOWER_BOUND;
+import static org.jfree.date.SerialDate.SERIAL_UPPER_BOUND;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -73,30 +52,7 @@ public class SerialDateUtilities {
     /**
      * Strings representing the weekdays.
      */
-    private String[] weekdays;
-
-    /**
-     * Strings representing the months.
-     */
-    private String[] months;
-
-    /**
-     * Creates a new utility class for the default locale.
-     */
-    public SerialDateUtilities() {
-        /* The default date format symbols. */
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
-        this.weekdays = dateFormatSymbols.getWeekdays();
-        this.months = dateFormatSymbols.getMonths();
-    }
-
-    static void checkValidSerial(int serial) {
-        if (serial < SerialDate.SERIAL_LOWER_BOUND || serial > SerialDate.SERIAL_UPPER_BOUND) {
-            throw new IllegalArgumentException(
-                "SpreadsheetDate: Serial must be in range " + SerialDate.SERIAL_LOWER_BOUND
-                    + " to " + SerialDate.SERIAL_UPPER_BOUND);
-        }
-    }
+    private static final String[] WEEKDAYS = new DateFormatSymbols().getWeekdays();
 
     static void validate(int day, int month, int year) {
         checkValidYear(year);
@@ -104,15 +60,27 @@ public class SerialDateUtilities {
         checkValidDay(day, month, year);
     }
 
+    static void checkValidSerial(int serial) {
+        if (isValidSerial(serial)) {
+            throw new IllegalArgumentException(
+                "SpreadsheetDate: Serial must be in range " + SERIAL_LOWER_BOUND
+                    + " to " + SERIAL_UPPER_BOUND);
+        }
+    }
+
+    private static boolean isValidSerial(int serial) {
+        return serial < SERIAL_LOWER_BOUND || serial > SERIAL_UPPER_BOUND;
+    }
+
     static void checkValidDay(int day, int month, int year) {
-        if (day < 1 || day > lastDayOfMonth(month, year)) {
+        if (isValidDay(day, month, year)) {
             throw new IllegalArgumentException("The 'day' must be valid for the calendar month.");
         }
     }
 
-    static void checkValidYear(int year) {
-        if (year < 1900 || year > 9999) {
-            throw new IllegalArgumentException("The 'year' must be in range 1900 to 9999");
+    static void checkValidDayOfWeek(int targetWeekday) {
+        if (!isValidWeekdayCode(targetWeekday)) {
+            throw new IllegalArgumentException("Invalid day-of-the-week code.");
         }
     }
 
@@ -120,12 +88,27 @@ public class SerialDateUtilities {
      * Returns <code>true</code> if the supplied integer code represents a
      * valid day-of-the-week, and <code>false</code> otherwise.
      *
-     * @param code the code being checked for validity.
+     * @param weekday the code being checked for validity.
      * @return <code>true</code> if the supplied integer code represents a valid day-of-the-week,
      * and <code>false</code> otherwise.
      */
-    public static boolean isValidWeekdayCode(int code) {
-        return code > 0 && code < 8;
+    public static boolean isValidWeekdayCode(int weekday) {
+        return weekday > 0 && weekday < 8;
+    }
+
+    private static boolean isValidDay(int day, int month, int year) {
+        return day < 1 || day > lastDayOfMonth(month, year);
+    }
+
+    static void checkValidYear(int year) {
+        if (isValidYear(year)) {
+            throw new IllegalArgumentException("The 'year' must be in range "
+                + MINIMUM_YEAR_SUPPORTED + " to" + MAXIMUM_YEAR_SUPPORTED);
+        }
+    }
+
+    private static boolean isValidYear(int year) {
+        return year < MINIMUM_YEAR_SUPPORTED || year > MAXIMUM_YEAR_SUPPORTED;
     }
 
     /**
@@ -135,10 +118,10 @@ public class SerialDateUtilities {
      * @return <code>-1</code> if the string is not convertible, the day of the week otherwise.
      */
     public static int stringToWeekdayCode(String s) {
-        String[] shortWeekdayNames = SerialDate.DATE_FORMAT_SYMBOLS.getShortWeekdays();
-        String[] weekDayNames = SerialDate.DATE_FORMAT_SYMBOLS.getWeekdays();
+        String[] shortWeekdayNames = DATE_FORMAT_SYMBOLS.getShortWeekdays();
+        String[] weekDayNames = DATE_FORMAT_SYMBOLS.getWeekdays();
 
-        return stringToCode(s, shortWeekdayNames, weekDayNames);
+        return stringToCode(s.trim(), shortWeekdayNames, weekDayNames);
     }
 
     /**
@@ -160,15 +143,14 @@ public class SerialDateUtilities {
             // suppress
         }
 
-        String[] shortMonthNames = SerialDateImpl.DATE_FORMAT_SYMBOLS.getShortMonths();
-        String[] monthNames = SerialDateImpl.DATE_FORMAT_SYMBOLS.getMonths();
+        String[] shortMonthNames = DATE_FORMAT_SYMBOLS.getShortMonths();
+        String[] monthNames = DATE_FORMAT_SYMBOLS.getMonths();
 
-        int code = stringToCode(s, shortMonthNames, monthNames);
+        int code = stringToCode(trimmedInput, shortMonthNames, monthNames);
         return code < 0 ? code : code + 1;
     }
 
     private static int stringToCode(String s, String[] shortNames, String[] names) {
-        s = s.trim();
         for (int i = 0; i < shortNames.length && i < names.length; i++) {
             if (shortNames[i].equals(s) || names[i].equals(s)) {
                 return i;
@@ -186,7 +168,7 @@ public class SerialDateUtilities {
      * @return a string representing the supplied day-of-the-week.
      */
     public static String weekdayCodeToString(int weekday) {
-        return SerialDate.DATE_FORMAT_SYMBOLS.getWeekdays()[weekday];
+        return DATE_FORMAT_SYMBOLS.getWeekdays()[weekday];
     }
 
     /**
@@ -206,6 +188,7 @@ public class SerialDateUtilities {
      */
     public static boolean isLeapYear(int year) {
         checkValidYear(year);
+
         return (year % 4) == 0 && ((year % 400) == 0 || (year % 100) != 0);
     }
 
@@ -219,7 +202,8 @@ public class SerialDateUtilities {
      * @return the number of leap years from 1900 to the specified year.
      */
     public static int leapYearCount(int year) {
-        // TODO shouldn't this verify inputs?
+        checkValidYear(year);
+
         int leap4 = (year - 1896) / 4;
         int leap100 = (year - 1800) / 100;
         int leap400 = (year - 1600) / 400;
@@ -244,18 +228,12 @@ public class SerialDateUtilities {
     }
 
     static int calculateDateAdjustment(int targetWeekday, SerialDate base) {
-        int baseDOW = base.getDayOfWeek();
+        int baseDOW = base.calculateDayOfWeek();
         int minAdjustment = Math.min(0, targetWeekday - baseDOW);
         if (baseDOW > targetWeekday) {
             return minAdjustment;
         }
         return minAdjustment - 7;
-    }
-
-    static void checkValidDayOfWeek(int targetWeekday) {
-        if (!isValidWeekdayCode(targetWeekday)) {
-            throw new IllegalArgumentException("Invalid day-of-the-week code.");
-        }
     }
 
     /**
@@ -266,8 +244,7 @@ public class SerialDateUtilities {
      * @param count an integer code representing the week-in-the-month.
      * @return a string corresponding to the week-in-the-month code.
      */
-    public static String weekInMonthToString(final int count) {
-
+    public static String weekInMonthToString(int count) {
         switch (count) {
             case SerialDateImpl.FIRST_WEEK_IN_MONTH:
                 return "First";
@@ -294,7 +271,6 @@ public class SerialDateUtilities {
      * @return a string representing the supplied 'relative'.
      */
     public static String relativeToString(final int relative) {
-
         switch (relative) {
             case SerialDateImpl.PRECEDING:
                 return "Preceding";
@@ -305,25 +281,6 @@ public class SerialDateUtilities {
             default:
                 return "ERROR : Relative To String";
         }
-
-    }
-
-    /**
-     * Returns an array of strings representing the days-of-the-week.
-     *
-     * @return an array of strings representing the days-of-the-week.
-     */
-    public String[] getWeekdays() {
-        return this.weekdays;
-    }
-
-    /**
-     * Returns an array of strings representing the months.
-     *
-     * @return an array of strings representing the months.
-     */
-    public String[] getMonths() {
-        return this.months;
     }
 
     /**
@@ -333,17 +290,17 @@ public class SerialDateUtilities {
      * @return an integer representing the day-of-the-week.
      */
     public int stringToWeekday(String s) {
-        if (s.equals(this.weekdays[Calendar.SATURDAY])) {
+        if (s.equals(WEEKDAYS[Calendar.SATURDAY])) {
             return SerialDateImpl.SATURDAY;
-        } else if (s.equals(this.weekdays[Calendar.SUNDAY])) {
+        } else if (s.equals(WEEKDAYS[Calendar.SUNDAY])) {
             return SerialDateImpl.SUNDAY;
-        } else if (s.equals(this.weekdays[Calendar.MONDAY])) {
+        } else if (s.equals(WEEKDAYS[Calendar.MONDAY])) {
             return SerialDateImpl.MONDAY;
-        } else if (s.equals(this.weekdays[Calendar.TUESDAY])) {
+        } else if (s.equals(WEEKDAYS[Calendar.TUESDAY])) {
             return SerialDateImpl.TUESDAY;
-        } else if (s.equals(this.weekdays[Calendar.WEDNESDAY])) {
+        } else if (s.equals(WEEKDAYS[Calendar.WEDNESDAY])) {
             return SerialDateImpl.WEDNESDAY;
-        } else if (s.equals(this.weekdays[Calendar.THURSDAY])) {
+        } else if (s.equals(WEEKDAYS[Calendar.THURSDAY])) {
             return SerialDateImpl.THURSDAY;
         } else {
             return SerialDateImpl.FRIDAY;
@@ -358,7 +315,7 @@ public class SerialDateUtilities {
      * @param end the end date.
      * @return the number of days between the start date and the end date.
      */
-    public static int dayCountActual(final SerialDate start, final SerialDateImpl end) {
+    public static int dayCountActual(SerialDate start, SerialDate end) {
         return end.compareTo(start);
     }
 
@@ -408,7 +365,7 @@ public class SerialDateUtilities {
      * @return The number of days between the two dates, assuming the 30/360 (ISDA) day-count
      * convention.
      */
-    public static int dayCount30ISDA(final SerialDate start, final SerialDate end) {
+    public static int dayCount30ISDA(SerialDate start, SerialDate end) {
         int d1;
         final int m1;
         final int y1;
@@ -552,10 +509,10 @@ public class SerialDateUtilities {
         int count = 0;
         int startYear = start.getYear();
         int endYear = end.getYear();
-        for (int year = startYear; year == endYear; year++) {
+        for (int year = startYear; year <= endYear; year++) {
             if (isLeapYear(year)) {
-                SerialDate feb29 = SerialDateImpl
-                    .createInstance(29, Month.FEBRUARY.getMonthCode(), year);
+                SerialDate feb29 = SpreadsheetDate
+                    .createInstance(29, Month.FEBRUARY, year);
                 if (feb29.isInRange(start, end, SerialDateImpl.INCLUDE_SECOND)) {
                     count++;
                 }
