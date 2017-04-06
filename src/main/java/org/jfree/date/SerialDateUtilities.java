@@ -46,6 +46,8 @@
 
 package org.jfree.date;
 
+import static org.jfree.date.Month.FEBRUARY;
+
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import javax.annotation.Nonnull;
@@ -88,6 +90,224 @@ public class SerialDateUtilities {
         this.months = dateFormatSymbols.getMonths();
     }
 
+    static void checkValidSerial(int serial) {
+        if (serial < SerialDate.SERIAL_LOWER_BOUND || serial > SerialDate.SERIAL_UPPER_BOUND) {
+            throw new IllegalArgumentException(
+                "SpreadsheetDate: Serial must be in range " + SerialDate.SERIAL_LOWER_BOUND
+                    + " to " + SerialDate.SERIAL_UPPER_BOUND);
+        }
+    }
+
+    static void validate(int day, int month, int year) {
+        checkValidYear(year);
+        Month.checkValidMonth(month);
+        checkValidDay(day, month, year);
+    }
+
+    static void checkValidDay(int day, int month, int year) {
+        if (day < 1 || day > lastDayOfMonth(month, year)) {
+            throw new IllegalArgumentException("The 'day' must be valid for the calendar month.");
+        }
+    }
+
+    static void checkValidYear(int year) {
+        if (year < 1900 || year > 9999) {
+            throw new IllegalArgumentException("The 'year' must be in range 1900 to 9999");
+        }
+    }
+
+    /**
+     * Returns <code>true</code> if the supplied integer code represents a
+     * valid day-of-the-week, and <code>false</code> otherwise.
+     *
+     * @param code the code being checked for validity.
+     * @return <code>true</code> if the supplied integer code represents a valid day-of-the-week,
+     * and <code>false</code> otherwise.
+     */
+    public static boolean isValidWeekdayCode(int code) {
+        return code > 0 && code < 8;
+    }
+
+    /**
+     * Converts the supplied string to a day of the week.
+     *
+     * @param s a string representing the day of the week.
+     * @return <code>-1</code> if the string is not convertible, the day of the week otherwise.
+     */
+    public static int stringToWeekdayCode(String s) {
+        String[] shortWeekdayNames = SerialDate.DATE_FORMAT_SYMBOLS.getShortWeekdays();
+        String[] weekDayNames = SerialDate.DATE_FORMAT_SYMBOLS.getWeekdays();
+
+        return stringToCode(s, shortWeekdayNames, weekDayNames);
+    }
+
+    /**
+     * Converts a string to a month code.
+     * <P>
+     * This method will return one of the constants JANUARY, FEBRUARY, ...,
+     * DECEMBER that corresponds to the string.  If the string is not
+     * recognised, this method returns -1.
+     *
+     * @param s the string to parse.
+     * @return <code>-1</code> if the string is not parseable, the month of the year otherwise.
+     */
+    public static int stringToMonthCode(String s) {
+        String trimmedInput = s.trim();
+        // first try parsing the string as an integer (1-12)...
+        try {
+            return Integer.parseInt(trimmedInput);
+        } catch (NumberFormatException e) {
+            // suppress
+        }
+
+        String[] shortMonthNames = SerialDateImpl.DATE_FORMAT_SYMBOLS.getShortMonths();
+        String[] monthNames = SerialDateImpl.DATE_FORMAT_SYMBOLS.getMonths();
+
+        int code = stringToCode(s, shortMonthNames, monthNames);
+        return code < 0 ? code : code + 1;
+    }
+
+    private static int stringToCode(String s, String[] shortNames, String[] names) {
+        s = s.trim();
+        for (int i = 0; i < shortNames.length && i < names.length; i++) {
+            if (shortNames[i].equals(s) || names[i].equals(s)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns a string representing the supplied day-of-the-week.
+     * <P>
+     * Need to find a better approach.
+     *
+     * @param weekday the day of the week.
+     * @return a string representing the supplied day-of-the-week.
+     */
+    public static String weekdayCodeToString(int weekday) {
+        return SerialDate.DATE_FORMAT_SYMBOLS.getWeekdays()[weekday];
+    }
+
+    /**
+     * Returns true if the supplied integer code represents a valid
+     * week-in-the-month, and false otherwise.
+     *
+     * @param weekInMonthCode the code being checked for validity.
+     * @return <code>true</code> if the supplied integer code represents a valid week-in-the-month.
+     */
+    public static boolean isValidWeekInMonthCode(int weekInMonthCode) {
+        return weekInMonthCode >= 0 && weekInMonthCode <= SerialDate.FOURTH_WEEK_IN_MONTH;
+    }
+
+    /**
+     * @param year the year (in the range 1900 to 9999).
+     * @return {@code true} if the specified year is a leap year.
+     */
+    public static boolean isLeapYear(int year) {
+        checkValidYear(year);
+        return (year % 4) == 0 && ((year % 400) == 0 || (year % 100) != 0);
+    }
+
+    /**
+     * Returns the number of leap years from 1900 to the specified year
+     * INCLUSIVE.
+     * <P>
+     * Note that 1900 is not a leap year.
+     *
+     * @param year the year (in the range 1900 to 9999).
+     * @return the number of leap years from 1900 to the specified year.
+     */
+    public static int leapYearCount(int year) {
+        // TODO shouldn't this verify inputs?
+        int leap4 = (year - 1896) / 4;
+        int leap100 = (year - 1800) / 100;
+        int leap400 = (year - 1600) / 400;
+        return leap4 - leap100 + leap400;
+    }
+
+    /**
+     * Returns the number of the last day of the month, taking into account
+     * leap years.
+     *
+     * @param month the month.
+     * @param year the year (in the range 1900 to 9999).
+     * @return the number of the last day of the month.
+     */
+    public static int lastDayOfMonth(int month, int year) {
+        int result = SerialDate.LAST_DAY_OF_MONTH[month];
+        if (month == FEBRUARY.getMonthCode() && isLeapYear(year)) {
+            return result + 1;
+        }
+
+        return result;
+    }
+
+    static int calculateDateAdjustment(int targetWeekday, SerialDate base) {
+        int baseDOW = base.getDayOfWeek();
+        int minAdjustment = Math.min(0, targetWeekday - baseDOW);
+        if (baseDOW > targetWeekday) {
+            return minAdjustment;
+        }
+        return minAdjustment - 7;
+    }
+
+    static void checkValidDayOfWeek(int targetWeekday) {
+        if (!isValidWeekdayCode(targetWeekday)) {
+            throw new IllegalArgumentException("Invalid day-of-the-week code.");
+        }
+    }
+
+    /**
+     * Returns a string corresponding to the week-in-the-month code.
+     * <P>
+     * Need to find a better approach.
+     *
+     * @param count an integer code representing the week-in-the-month.
+     * @return a string corresponding to the week-in-the-month code.
+     */
+    public static String weekInMonthToString(final int count) {
+
+        switch (count) {
+            case SerialDateImpl.FIRST_WEEK_IN_MONTH:
+                return "First";
+            case SerialDateImpl.SECOND_WEEK_IN_MONTH:
+                return "Second";
+            case SerialDateImpl.THIRD_WEEK_IN_MONTH:
+                return "Third";
+            case SerialDateImpl.FOURTH_WEEK_IN_MONTH:
+                return "Fourth";
+            case SerialDateImpl.LAST_WEEK_IN_MONTH:
+                return "Last";
+            default:
+                return "SerialDate.weekInMonthToString(): invalid code.";
+        }
+
+    }
+
+    /**
+     * Returns a string representing the supplied 'relative'.
+     * <P>
+     * Need to find a better approach.
+     *
+     * @param relative a constant representing the 'relative'.
+     * @return a string representing the supplied 'relative'.
+     */
+    public static String relativeToString(final int relative) {
+
+        switch (relative) {
+            case SerialDateImpl.PRECEDING:
+                return "Preceding";
+            case SerialDateImpl.NEAREST:
+                return "Nearest";
+            case SerialDateImpl.FOLLOWING:
+                return "Following";
+            default:
+                return "ERROR : Relative To String";
+        }
+
+    }
+
     /**
      * Returns an array of strings representing the days-of-the-week.
      *
@@ -114,19 +334,19 @@ public class SerialDateUtilities {
      */
     public int stringToWeekday(String s) {
         if (s.equals(this.weekdays[Calendar.SATURDAY])) {
-            return SerialDate.SATURDAY;
+            return SerialDateImpl.SATURDAY;
         } else if (s.equals(this.weekdays[Calendar.SUNDAY])) {
-            return SerialDate.SUNDAY;
+            return SerialDateImpl.SUNDAY;
         } else if (s.equals(this.weekdays[Calendar.MONDAY])) {
-            return SerialDate.MONDAY;
+            return SerialDateImpl.MONDAY;
         } else if (s.equals(this.weekdays[Calendar.TUESDAY])) {
-            return SerialDate.TUESDAY;
+            return SerialDateImpl.TUESDAY;
         } else if (s.equals(this.weekdays[Calendar.WEDNESDAY])) {
-            return SerialDate.WEDNESDAY;
+            return SerialDateImpl.WEDNESDAY;
         } else if (s.equals(this.weekdays[Calendar.THURSDAY])) {
-            return SerialDate.THURSDAY;
+            return SerialDateImpl.THURSDAY;
         } else {
-            return SerialDate.FRIDAY;
+            return SerialDateImpl.FRIDAY;
         }
 
     }
@@ -138,7 +358,7 @@ public class SerialDateUtilities {
      * @param end the end date.
      * @return the number of days between the start date and the end date.
      */
-    public static int dayCountActual(final SerialDate start, final SerialDate end) {
+    public static int dayCountActual(final SerialDate start, final SerialDateImpl end) {
         return end.compareTo(start);
     }
 
@@ -312,7 +532,7 @@ public class SerialDateUtilities {
     public static boolean isLastDayOfFebruary(@Nonnull SerialDate d) {
         if (d.getMonth() == Month.FEBRUARY.getMonthCode()) {
             int dom = d.getDayOfMonth();
-            return SerialDate.isLeapYear(d.getYear()) && dom == 29 || dom == 28;
+            return isLeapYear(d.getYear()) && dom == 29 || dom == 28;
         }
         return false;
     }
@@ -333,10 +553,10 @@ public class SerialDateUtilities {
         int startYear = start.getYear();
         int endYear = end.getYear();
         for (int year = startYear; year == endYear; year++) {
-            if (SerialDate.isLeapYear(year)) {
-                SerialDate feb29 = SerialDate
+            if (isLeapYear(year)) {
+                SerialDate feb29 = SerialDateImpl
                     .createInstance(29, Month.FEBRUARY.getMonthCode(), year);
-                if (feb29.isInRange(start, end, SerialDate.INCLUDE_SECOND)) {
+                if (feb29.isInRange(start, end, SerialDateImpl.INCLUDE_SECOND)) {
                     count++;
                 }
             }

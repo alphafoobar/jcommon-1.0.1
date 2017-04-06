@@ -78,7 +78,7 @@ import javax.annotation.Nonnull;
  *
  * @author David Gilbert
  */
-public class SpreadsheetDate extends SerialDate {
+public class SpreadsheetDate extends SerialDateImpl {
     private static final long serialVersionUID = 0L;
 
     private int serial;
@@ -98,7 +98,7 @@ public class SpreadsheetDate extends SerialDate {
      * @param year the year (in the range 1900 to 9999).
      */
     public SpreadsheetDate(int day, int month, int year) {
-        validate(day, month, year);
+        SerialDateUtilities.validate(day, month, year);
 
         this.year = year;
         this.month = month;
@@ -109,7 +109,7 @@ public class SpreadsheetDate extends SerialDate {
     }
 
     public SpreadsheetDate(int serial) {
-        checkValidSerial(serial);
+        SerialDateUtilities.checkValidSerial(serial);
 
         this.serial = serial;
 
@@ -182,7 +182,7 @@ public class SpreadsheetDate extends SerialDate {
     /**
      * Returns a code representing the day of the week.
      * <P>
-     * The codes are defined in the {@link SerialDate} class as:
+     * The codes are defined in the {@link SerialDateImpl} class as:
      * <code>SUNDAY</code>, <code>MONDAY</code>, <code>TUESDAY</code>,
      * <code>WEDNESDAY</code>, <code>THURSDAY</code>, <code>FRIDAY</code>, and
      * <code>SATURDAY</code>.
@@ -272,7 +272,7 @@ public class SpreadsheetDate extends SerialDate {
     }
 
     /**
-     * Returns <code>true</code> if this {@link SerialDate} is within the
+     * Returns <code>true</code> if this {@link SerialDateImpl} is within the
      * specified range (INCLUSIVE).
      *
      * @param dateFrom a boundary date for the range.
@@ -281,7 +281,7 @@ public class SpreadsheetDate extends SerialDate {
      */
     @Override
     public boolean isInRange(@Nonnull SerialDate dateFrom, @Nonnull SerialDate dateTo) {
-        return isInRange(dateFrom, dateTo, SerialDate.INCLUDE_BOTH);
+        return isInRange(dateFrom, dateTo, SerialDateImpl.INCLUDE_BOTH);
     }
 
     /**
@@ -301,15 +301,15 @@ public class SpreadsheetDate extends SerialDate {
         int start = dateFrom.toSerial();
         int end = dateTo.toSerial();
 
-        if (inclusionRule == SerialDate.INCLUDE_BOTH) {
+        if (inclusionRule == SerialDateImpl.INCLUDE_BOTH) {
             return serial >= start && serial <= end;
         }
 
-        if (inclusionRule == SerialDate.INCLUDE_FIRST) {
+        if (inclusionRule == SerialDateImpl.INCLUDE_FIRST) {
             return serial >= start && serial < end;
         }
 
-        if (inclusionRule == SerialDate.INCLUDE_SECOND) {
+        if (inclusionRule == SerialDateImpl.INCLUDE_SECOND) {
             return serial > start && serial <= end;
         }
 
@@ -327,10 +327,10 @@ public class SpreadsheetDate extends SerialDate {
      * @return the serial number from the day, month and year.
      */
     private static int calcSerial(int day, int month, int year) {
-        int yy = ((year - 1900) * 365) + SerialDate.leapYearCount(year - 1);
-        int mm = SerialDate.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
+        int yy = ((year - 1900) * 365) + SerialDateUtilities.leapYearCount(year - 1);
+        int mm = SerialDateImpl.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
         if (month > Month.FEBRUARY.getMonthCode()) {
-            if (SerialDate.isLeapYear(year)) {
+            if (SerialDateUtilities.isLeapYear(year)) {
                 mm = mm + 1;
             }
         }
@@ -350,7 +350,7 @@ public class SpreadsheetDate extends SerialDate {
 
         int[] daysToEndOfPrecedingMonth = AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH;
 
-        if (isLeapYear(this.year)) {
+        if (SerialDateUtilities.isLeapYear(this.year)) {
             daysToEndOfPrecedingMonth = LEAP_YEAR_AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH;
         }
 
@@ -370,7 +370,7 @@ public class SpreadsheetDate extends SerialDate {
     private void setYearFromSerialDays(int days) {
         int yearIgnoringLeapYears = calculateYearIgnoringLeapYears(days);
         int yearWithOverEstimatedLeapYears = calculateYearIgnoringLeapYears(
-            days - SerialDate.leapYearCount(yearIgnoringLeapYears));
+            days - SerialDateUtilities.leapYearCount(yearIgnoringLeapYears));
 
         if (yearWithOverEstimatedLeapYears == yearIgnoringLeapYears) {
             this.year = yearWithOverEstimatedLeapYears;

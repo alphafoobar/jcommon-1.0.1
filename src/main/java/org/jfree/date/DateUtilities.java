@@ -1,8 +1,5 @@
-/* ========================================================================
- * JCommon : a free general purpose class library for the Java(tm) platform
- * ========================================================================
- *
- * (C) Copyright 2000-2005, by Object Refinery Limited and Contributors.
+/*
+ * (C) Copyright 2000-2005, by Object Refinery Limited.
  * 
  * Project Info:  http://www.jfree.org/jcommon/index.html
  *
@@ -21,62 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
  * USA.  
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
- * in the United States and other countries.]
- *
- * ------------------
- * DateUtilities.java
- * ------------------
- * (C) Copyright 2002, 2003, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * $Id: DateUtilities.java,v 1.4 2005/11/16 15:58:40 taqua Exp $
- *
- * Changes
- * -------
- * 11-Oct-2002 : Version 1 (DG);
- * 03-Apr-2003 : Added clear() method call (DG)
- *
  */
 
 package org.jfree.date;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtilities {
 
-    /**
-     * @param year the year.
-     * @param month the month (1 - 12).
-     * @param day the day.
-     * @return a date.
-     */
     public static Date createDate(int year, int month, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear();
-        calendar.set(year, month - 1, day);
-        return calendar.getTime();
-    }
-
-    /**
-     * @param year the year.
-     * @param month the month (1 - 12).
-     * @param day the day.
-     * @param hour the hour.
-     * @param min the minute.
-     * @return a date.
-     */
-    public static Date createDate(int year, int month, int day, int hour, int min) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear();
-        calendar.set(year, month - 1, day, hour, min);
-        return calendar.getTime();
-    }
-
-    public static Date createDateFromSerialDate(SerialDate serialDate) {
-        return serialDate.toDate();
+        return SerialDateImpl.createInstance(day, month, year).toDate();
     }
 }

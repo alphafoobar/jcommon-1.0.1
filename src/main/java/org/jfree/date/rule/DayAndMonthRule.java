@@ -47,6 +47,7 @@ package org.jfree.date.rule;
 
 import org.jfree.date.Month;
 import org.jfree.date.SerialDate;
+import org.jfree.date.SerialDateImpl;
 
 /**
  * An annual date rule where the generated date always falls on the same day
@@ -112,7 +113,7 @@ public class DayAndMonthRule extends AnnualDateRule {
     }
 
     private void checkValidDayOfMonth(int dayOfMonth) {
-        if (dayOfMonth < 1 || dayOfMonth > SerialDate.LAST_DAY_OF_MONTH[this.month]) {
+        if (dayOfMonth < 1 || dayOfMonth > SerialDateImpl.LAST_DAY_OF_MONTH[this.month]) {
             throw new IllegalArgumentException(
                 "DayAndMonthRule(): dayOfMonth outside valid range.");
         }
@@ -152,6 +153,6 @@ public class DayAndMonthRule extends AnnualDateRule {
      */
     @Override
     public SerialDate getDate(int year) {
-        return SerialDate.createInstance(dayOfMonth, month, year);
+        return SerialDateImpl.createInstance(dayOfMonth, month, year);
     }
 }

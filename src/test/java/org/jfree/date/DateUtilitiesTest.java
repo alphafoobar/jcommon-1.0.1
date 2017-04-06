@@ -15,21 +15,6 @@ public class DateUtilitiesTest {
             equalTo(calendar.getTime()));
     }
 
-    @Test
-    public void createDate_withTime() throws Exception {
-        Calendar calendar = createCalendar(2017, Calendar.APRIL, 7);
-        assertThat(DateUtilities.createDate(2017, Month.APRIL.getMonthCode(), 7, 0, 0),
-            equalTo(calendar.getTime()));
-    }
-
-    @Test
-    public void createDate_fromSpreadsheetDate() throws Exception {
-        Calendar calendar = createCalendar(2017, Calendar.APRIL, 7);
-        assertThat(DateUtilities
-                .createDateFromSerialDate(SerialDate.createInstance(7, Month.APRIL, 2017)),
-            equalTo(calendar.getTime()));
-    }
-
     private Calendar createCalendar(int year, int month, int date) {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();

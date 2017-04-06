@@ -44,6 +44,7 @@
 package org.jfree.date.rule;
 
 import org.jfree.date.SerialDate;
+import org.jfree.date.SerialDateImpl;
 
 /**
  * An annual date rule that returns a date for each year based on (a) a
@@ -72,7 +73,7 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
      * Default constructor - builds a rule for the Monday following 1 January.
      */
     public RelativeDayOfWeekRule() {
-        this(new DayAndMonthRule(), SerialDate.MONDAY, SerialDate.FOLLOWING);
+        this(new DayAndMonthRule(), SerialDateImpl.MONDAY, SerialDateImpl.FOLLOWING);
     }
 
     /**
@@ -179,12 +180,12 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
         SerialDate base = this.dateRule.getDate(year);
         if (base != null) {
             switch (this.relative) {
-                case (SerialDate.PRECEDING):
-                    return SerialDate.getPreviousDayOfWeek(this.dayOfWeek, base);
-                case (SerialDate.NEAREST):
-                    return SerialDate.getNearestDayOfWeek(this.dayOfWeek, base);
-                case (SerialDate.FOLLOWING):
-                    return SerialDate.getFollowingDayOfWeek(this.dayOfWeek, base);
+                case (SerialDateImpl.PRECEDING):
+                    return SerialDateImpl.getPreviousDayOfWeek(this.dayOfWeek, base);
+                case (SerialDateImpl.NEAREST):
+                    return SerialDateImpl.getNearestDayOfWeek(this.dayOfWeek, base);
+                case (SerialDateImpl.FOLLOWING):
+                    return SerialDateImpl.getFollowingDayOfWeek(this.dayOfWeek, base);
             }
         }
         return null;
@@ -192,8 +193,8 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
     }
 
     private void checkValidYear(int year) {
-        if ((year < SerialDate.MINIMUM_YEAR_SUPPORTED)
-            || (year > SerialDate.MAXIMUM_YEAR_SUPPORTED)) {
+        if ((year < SerialDateImpl.MINIMUM_YEAR_SUPPORTED)
+            || (year > SerialDateImpl.MAXIMUM_YEAR_SUPPORTED)) {
             throw new IllegalArgumentException(
                 "RelativeDayOfWeekRule.getDate(): year outside valid range.");
         }

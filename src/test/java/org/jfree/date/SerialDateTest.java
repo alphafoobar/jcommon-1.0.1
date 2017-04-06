@@ -9,15 +9,15 @@ public class SerialDateTest {
 
     @Test
     public void isValidWeekdayCode() throws Exception {
-        assertFalse(SerialDate.isValidWeekdayCode(-11));
-        assertFalse(SerialDate.isValidWeekdayCode(0));
-        assertTrue(SerialDate.isValidWeekdayCode(1));
-        assertTrue(SerialDate.isValidWeekdayCode(SerialDate.WEDNESDAY));
-        assertTrue(SerialDate.isValidWeekdayCode(SerialDate.FRIDAY));
-        assertTrue(SerialDate.isValidWeekdayCode(6));
-        assertTrue(SerialDate.isValidWeekdayCode(SerialDate.SATURDAY));
-        assertFalse(SerialDate.isValidWeekdayCode(13));
-        assertFalse(SerialDate.isValidWeekdayCode(112));
+        assertFalse(SerialDateUtilities.isValidWeekdayCode(-11));
+        assertFalse(SerialDateUtilities.isValidWeekdayCode(0));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(1));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDateImpl.WEDNESDAY));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDateImpl.FRIDAY));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(6));
+        assertTrue(SerialDateUtilities.isValidWeekdayCode(SerialDateImpl.SATURDAY));
+        assertFalse(SerialDateUtilities.isValidWeekdayCode(13));
+        assertFalse(SerialDateUtilities.isValidWeekdayCode(112));
     }
 
 }
