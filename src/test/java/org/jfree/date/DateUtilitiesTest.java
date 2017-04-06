@@ -11,14 +11,14 @@ public class DateUtilitiesTest {
     @Test
     public void createDate() throws Exception {
         Calendar calendar = createCalendar(2017, Calendar.APRIL, 7);
-        assertThat(DateUtilities.createDate(2017, MonthConstants.APRIL, 7),
+        assertThat(DateUtilities.createDate(2017, Month.APRIL.getMonthCode(), 7),
             equalTo(calendar.getTime()));
     }
 
     @Test
     public void createDate_withTime() throws Exception {
         Calendar calendar = createCalendar(2017, Calendar.APRIL, 7);
-        assertThat(DateUtilities.createDate(2017, MonthConstants.APRIL, 7, 0, 0),
+        assertThat(DateUtilities.createDate(2017, Month.APRIL.getMonthCode(), 7, 0, 0),
             equalTo(calendar.getTime()));
     }
 
@@ -26,7 +26,7 @@ public class DateUtilitiesTest {
     public void createDate_fromSpreadsheetDate() throws Exception {
         Calendar calendar = createCalendar(2017, Calendar.APRIL, 7);
         assertThat(DateUtilities
-                .createDateFromSerialDate(SerialDate.createInstance(7, MonthConstants.APRIL, 2017)),
+                .createDateFromSerialDate(SerialDate.createInstance(7, Month.APRIL, 2017)),
             equalTo(calendar.getTime()));
     }
 

@@ -310,7 +310,7 @@ public class SerialDateUtilities {
      * February.
      */
     public static boolean isLastDayOfFebruary(@Nonnull SerialDate d) {
-        if (d.getMonth() == MonthConstants.FEBRUARY) {
+        if (d.getMonth() == Month.FEBRUARY.getMonthCode()) {
             int dom = d.getDayOfMonth();
             return SerialDate.isLeapYear(d.getYear()) && dom == 29 || dom == 28;
         }
@@ -334,7 +334,8 @@ public class SerialDateUtilities {
         int endYear = end.getYear();
         for (int year = startYear; year == endYear; year++) {
             if (SerialDate.isLeapYear(year)) {
-                SerialDate feb29 = SerialDate.createInstance(29, MonthConstants.FEBRUARY, year);
+                SerialDate feb29 = SerialDate
+                    .createInstance(29, Month.FEBRUARY.getMonthCode(), year);
                 if (feb29.isInRange(start, end, SerialDate.INCLUDE_SECOND)) {
                     count++;
                 }

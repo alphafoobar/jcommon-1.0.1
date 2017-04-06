@@ -79,13 +79,16 @@ import javax.annotation.Nonnull;
  * @author David Gilbert
  */
 public class SpreadsheetDate extends SerialDate {
-
     private static final long serialVersionUID = 0L;
 
     private int serial;
     private int day;
     private int month;
     private int year;
+
+    public SpreadsheetDate(int day, Month month, int year) {
+        this(day, month.getMonthCode(), year);
+    }
 
     /**
      * Creates a new date instance.
@@ -103,7 +106,6 @@ public class SpreadsheetDate extends SerialDate {
 
         // the serial number needs to be synchronised with the day-month-year...
         this.serial = calcSerial(day, month, year);
-
     }
 
     public SpreadsheetDate(int serial) {
@@ -113,42 +115,6 @@ public class SpreadsheetDate extends SerialDate {
 
         // the day-month-year needs to be synchronised with the serial number...
         calcDayMonthYearFromSerial();
-    }
-
-    private void checkValidSerial(int serial) {
-        if (serial < SERIAL_LOWER_BOUND || serial > SERIAL_UPPER_BOUND) {
-            throw new IllegalArgumentException(
-                "SpreadsheetDate: Serial must be in range " + SERIAL_LOWER_BOUND
-                    + " to " + SERIAL_UPPER_BOUND);
-        }
-    }
-
-    private void validate(int day, int month, int year) {
-        checkValidYear(year);
-        checkValidMonth(month);
-        checkValidDay(day, month, year);
-    }
-
-    private void checkValidDay(int day, int month, int year) {
-        if (day < 1 || day > SerialDate.lastDayOfMonth(month, year)) {
-            throw new IllegalArgumentException("Invalid 'day' argument.");
-        }
-    }
-
-    private void checkValidMonth(int month) {
-        if (month < MonthConstants.JANUARY || month > MonthConstants.DECEMBER) {
-            throw new IllegalArgumentException(
-                "The 'month' argument must be in the range 1 to 12."
-            );
-        }
-    }
-
-    private void checkValidYear(int year) {
-        if (year < 1900 || year > 9999) {
-            throw new IllegalArgumentException(
-                "The 'year' argument must be in range 1900 to 9999."
-            );
-        }
     }
 
     /**
@@ -363,7 +329,7 @@ public class SpreadsheetDate extends SerialDate {
     private static int calcSerial(int day, int month, int year) {
         int yy = ((year - 1900) * 365) + SerialDate.leapYearCount(year - 1);
         int mm = SerialDate.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
-        if (month > MonthConstants.FEBRUARY) {
+        if (month > Month.FEBRUARY.getMonthCode()) {
             if (SerialDate.isLeapYear(year)) {
                 mm = mm + 1;
             }

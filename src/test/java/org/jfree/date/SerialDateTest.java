@@ -20,15 +20,4 @@ public class SerialDateTest {
         assertFalse(SerialDate.isValidWeekdayCode(112));
     }
 
-    @Test
-    public void isValidMonthCode() throws Exception {
-        assertFalse(SerialDate.isValidMonthCode(-11));
-        assertFalse(SerialDate.isValidMonthCode(0));
-        assertTrue(SerialDate.isValidMonthCode(1));
-        assertTrue(SerialDate.isValidMonthCode(MonthConstants.APRIL));
-        assertTrue(SerialDate.isValidMonthCode(MonthConstants.DECEMBER));
-        assertFalse(SerialDate.isValidMonthCode(13));
-        assertFalse(SerialDate.isValidMonthCode(112));
-    }
-
 }

@@ -59,11 +59,16 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class SerialDateTests {
 
-    private SerialDate nov9Y2001 = SerialDate.createInstance(9, MonthConstants.NOVEMBER, 2001);
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    private SerialDate nov9Y2001 = SerialDate.createInstance(9, Month.NOVEMBER, 2001);
 
     @Test
     public void testAddMonthsTo9Nov2001() {
@@ -74,14 +79,14 @@ public class SerialDateTests {
 
     @Test
     public void testAddMonthsTo5Oct2003() {
-        final SerialDate d1 = SerialDate.createInstance(5, MonthConstants.OCTOBER, 2003);
+        final SerialDate d1 = SerialDate.createInstance(5, Month.OCTOBER, 2003);
         final SerialDate d2 = SerialDate.addMonths(2, d1);
-        assertEquals(d2, SerialDate.createInstance(5, MonthConstants.DECEMBER, 2003));
+        assertEquals(d2, SerialDate.createInstance(5, Month.DECEMBER, 2003));
     }
 
     @Test
     public void testAddMonthsTo1Jan2003() {
-        final SerialDate d1 = SerialDate.createInstance(1, MonthConstants.JANUARY, 2003);
+        final SerialDate d1 = SerialDate.createInstance(1, Month.JANUARY, 2003);
         final SerialDate d2 = SerialDate.addMonths(0, d1);
         assertEquals(d2, d1);
     }
@@ -112,7 +117,7 @@ public class SerialDateTests {
 
     @Test
     public void testMondayNearest22Jan1970() {
-        SerialDate jan22Y1970 = SerialDate.createInstance(22, MonthConstants.JANUARY, 1970);
+        SerialDate jan22Y1970 = SerialDate.createInstance(22, Month.JANUARY, 1970);
         SerialDate mondayNearest = SerialDate.getNearestDayOfWeek(SerialDate.MONDAY, jan22Y1970);
         assertEquals(19, mondayNearest.getDayOfMonth());
     }
@@ -160,22 +165,24 @@ public class SerialDateTests {
 
     @Test
     public void testStringToMonthCode() {
-
         int m = SerialDate.stringToMonthCode("January");
-        assertEquals(MonthConstants.JANUARY, m);
+        assertEquals(Month.JANUARY.getMonthCode(), m);
 
         m = SerialDate.stringToMonthCode(" January ");
-        assertEquals(MonthConstants.JANUARY, m);
+        assertEquals(Month.JANUARY.getMonthCode(), m);
 
         m = SerialDate.stringToMonthCode("Jan");
-        assertEquals(MonthConstants.JANUARY, m);
-
+        assertEquals(Month.JANUARY.getMonthCode(), m);
     }
 
     @Test
     public void testMonthCodeToStringCode() {
-        String test = SerialDate.monthCodeToString(MonthConstants.DECEMBER);
-        assertEquals("December", test);
+        assertEquals("December", Month.DECEMBER.getLongName());
+    }
+
+    @Test
+    public void testMonthOctoberGetShort() {
+        assertEquals("Jan", Month.JANUARY.getShortName());
     }
 
     @Test
@@ -185,7 +192,9 @@ public class SerialDateTests {
 
     @Test
     public void testIsNotLeapYear1800() {
-        assertFalse(SerialDate.isLeapYear(1800));
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("The 'year' must be in range");
+        SerialDate.isLeapYear(1800);
     }
 
     @Test

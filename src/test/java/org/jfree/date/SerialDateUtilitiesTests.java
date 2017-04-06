@@ -52,8 +52,8 @@ public class SerialDateUtilitiesTests {
 
     @Test
     public void testDayCountActual() {
-        final SerialDate d1 = SerialDate.createInstance(1, MonthConstants.APRIL, 2002);
-        final SerialDate d2 = SerialDate.createInstance(2, MonthConstants.APRIL, 2002);
+        final SerialDate d1 = SerialDate.createInstance(1, Month.APRIL, 2002);
+        final SerialDate d2 = SerialDate.createInstance(2, Month.APRIL, 2002);
         final int count = SerialDateUtilities.dayCountActual(d1, d2);
         assertEquals(1, count);
     }
@@ -63,8 +63,8 @@ public class SerialDateUtilitiesTests {
      */
     @Test
     public void testDayCount30() {
-        final SerialDate d1 = SerialDate.createInstance(1, MonthConstants.APRIL, 2002);
-        final SerialDate d2 = SerialDate.createInstance(2, MonthConstants.APRIL, 2002);
+        final SerialDate d1 = SerialDate.createInstance(1, Month.APRIL, 2002);
+        final SerialDate d2 = SerialDate.createInstance(2, Month.APRIL, 2002);
         final int count = SerialDateUtilities.dayCount30(d1, d2);
         assertEquals(1, count);
     }
@@ -74,8 +74,8 @@ public class SerialDateUtilitiesTests {
      */
     @Test
     public void testDayCount30ISDA() {
-        final SerialDate d1 = SerialDate.createInstance(1, MonthConstants.APRIL, 2002);
-        final SerialDate d2 = SerialDate.createInstance(2, MonthConstants.APRIL, 2002);
+        final SerialDate d1 = SerialDate.createInstance(1, Month.APRIL, 2002);
+        final SerialDate d2 = SerialDate.createInstance(2, Month.APRIL, 2002);
         final int count = SerialDateUtilities.dayCount30ISDA(d1, d2);
         assertEquals(1, count);
     }
@@ -85,8 +85,8 @@ public class SerialDateUtilitiesTests {
      */
     @Test
     public void testDayCount30PSA() {
-        final SerialDate d1 = SerialDate.createInstance(1, MonthConstants.APRIL, 2002);
-        final SerialDate d2 = SerialDate.createInstance(2, MonthConstants.APRIL, 2002);
+        final SerialDate d1 = SerialDate.createInstance(1, Month.APRIL, 2002);
+        final SerialDate d2 = SerialDate.createInstance(2, Month.APRIL, 2002);
         final int count = SerialDateUtilities.dayCount30PSA(d1, d2);
         assertEquals(1, count);
     }
@@ -96,32 +96,32 @@ public class SerialDateUtilitiesTests {
      */
     @Test
     public void testDayCount3030E() {
-        SerialDate d1 = SerialDate.createInstance(1, MonthConstants.APRIL, 2002);
-        SerialDate d2 = SerialDate.createInstance(2, MonthConstants.APRIL, 2002);
+        SerialDate d1 = SerialDate.createInstance(1, Month.APRIL, 2002);
+        SerialDate d2 = SerialDate.createInstance(2, Month.APRIL, 2002);
         int count = SerialDateUtilities.dayCount30E(d1, d2);
         assertEquals(1, count);
     }
 
     @Test
     public void testCountFeb29s_onOneDay() {
-        SerialDate start = SerialDate.createInstance(29, MonthConstants.FEBRUARY, 2000);
-        SerialDate end = SerialDate.createInstance(29, MonthConstants.FEBRUARY, 2000);
+        SerialDate start = SerialDate.createInstance(29, Month.FEBRUARY, 2000);
+        SerialDate end = SerialDate.createInstance(29, Month.FEBRUARY, 2000);
         assertEquals(0, SerialDateUtilities.dayCount30E(start, end));
     }
 
     @Test
     @Ignore // Expected 1 got 88
     public void testCountFeb29s_inAFewDays() {
-        SerialDate start = SerialDate.createInstance(1, MonthConstants.FEBRUARY, 2000);
-        SerialDate end = SerialDate.createInstance(29, MonthConstants.APRIL, 2000);
+        SerialDate start = SerialDate.createInstance(1, Month.FEBRUARY, 2000);
+        SerialDate end = SerialDate.createInstance(29, Month.APRIL, 2000);
         assertEquals(1, SerialDateUtilities.dayCount30E(start, end));
     }
 
     @Test
     @Ignore // Expected 3 got 3688
     public void testCountFeb29s_inAFewYears() {
-        SerialDate start = SerialDate.createInstance(1, MonthConstants.FEBRUARY, 2000);
-        SerialDate end = SerialDate.createInstance(29, MonthConstants.APRIL, 2010);
+        SerialDate start = SerialDate.createInstance(1, Month.FEBRUARY, 2000);
+        SerialDate end = SerialDate.createInstance(29, Month.APRIL, 2010);
         assertEquals(3, SerialDateUtilities.dayCount30E(start, end));
     }
 }

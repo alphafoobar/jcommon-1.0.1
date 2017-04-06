@@ -58,6 +58,8 @@
 
 package org.jfree.date;
 
+import static org.jfree.date.Month.FEBRUARY;
+
 import java.io.Serializable;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -83,9 +85,7 @@ import java.util.GregorianCalendar;
  *
  * @author David Gilbert
  */
-public abstract class SerialDate implements Comparable<SerialDate>,
-                                            Serializable, 
-                                            MonthConstants {
+public abstract class SerialDate implements Comparable<SerialDate>, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = 0L;
@@ -195,10 +195,30 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      */
     public static final int FOLLOWING = 1;
 
-    /**
-     * Default constructor.
-     */
-    protected SerialDate() {
+    static void checkValidSerial(int serial) {
+        if (serial < SERIAL_LOWER_BOUND || serial > SERIAL_UPPER_BOUND) {
+            throw new IllegalArgumentException(
+                "SpreadsheetDate: Serial must be in range " + SERIAL_LOWER_BOUND
+                    + " to " + SERIAL_UPPER_BOUND);
+        }
+    }
+
+    static void validate(int day, int month, int year) {
+        checkValidYear(year);
+        Month.checkValidMonth(month);
+        checkValidDay(day, month, year);
+    }
+
+    static void checkValidDay(int day, int month, int year) {
+        if (day < 1 || day > SerialDate.lastDayOfMonth(month, year)) {
+            throw new IllegalArgumentException("The 'day' must be valid for the calendar month.");
+        }
+    }
+
+    static void checkValidYear(int year) {
+        if (year < 1900 || year > 9999) {
+            throw new IllegalArgumentException("The 'year' must be in range 1900 to 9999");
+        }
     }
 
     /**
@@ -225,14 +245,43 @@ public abstract class SerialDate implements Comparable<SerialDate>,
         String[] shortWeekdayNames = DATE_FORMAT_SYMBOLS.getShortWeekdays();
         String[] weekDayNames = DATE_FORMAT_SYMBOLS.getWeekdays();
 
+        return stringToCode(s, shortWeekdayNames, weekDayNames);
+    }
+
+    /**
+     * Converts a string to a month code.
+     * <P>
+     * This method will return one of the constants JANUARY, FEBRUARY, ...,
+     * DECEMBER that corresponds to the string.  If the string is not
+     * recognised, this method returns -1.
+     *
+     * @param s the string to parse.
+     * @return <code>-1</code> if the string is not parseable, the month of the year otherwise.
+     */
+    public static int stringToMonthCode(String s) {
+        String trimmedInput = s.trim();
+        // first try parsing the string as an integer (1-12)...
+        try {
+            return Integer.parseInt(trimmedInput);
+        } catch (NumberFormatException e) {
+            // suppress
+        }
+
+        String[] shortMonthNames = SerialDate.DATE_FORMAT_SYMBOLS.getShortMonths();
+        String[] monthNames = SerialDate.DATE_FORMAT_SYMBOLS.getMonths();
+
+        int code = SerialDate.stringToCode(s, shortMonthNames, monthNames);
+        return code < 0 ? code : code + 1;
+    }
+
+    private static int stringToCode(String s, String[] shortNames, String[] names) {
         s = s.trim();
-        for (int i = 0; i < weekDayNames.length; i++) {
-            if (shortWeekdayNames[i].equals(s) || weekDayNames[i].equals(s)) {
+        for (int i = 0; i < shortNames.length && i < names.length; i++) {
+            if (shortNames[i].equals(s) || names[i].equals(s)) {
                 return i;
             }
         }
         return -1;
-
     }
 
     /**
@@ -244,11 +293,8 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @return a string representing the supplied day-of-the-week.
      */
-    public static String weekdayCodeToString(final int weekday) {
-
-        final String[] weekdays = DATE_FORMAT_SYMBOLS.getWeekdays();
-        return weekdays[weekday];
-
+    public static String weekdayCodeToString(int weekday) {
+        return DATE_FORMAT_SYMBOLS.getWeekdays()[weekday];
     }
 
     public static String[] getMonths() {
@@ -260,175 +306,23 @@ public abstract class SerialDate implements Comparable<SerialDate>,
     }
 
     /**
-     * Returns true if the supplied integer code represents a valid month.
-     *
-     * @param code  the code being checked for validity.
-     *
-     * @return <code>true</code> if the supplied integer code represents a 
-     *         valid month.
-     */
-    public static boolean isValidMonthCode(final int code) {
-        switch(code) {
-            case JANUARY: 
-            case FEBRUARY: 
-            case MARCH: 
-            case APRIL: 
-            case MAY: 
-            case JUNE: 
-            case JULY: 
-            case AUGUST: 
-            case SEPTEMBER: 
-            case OCTOBER: 
-            case NOVEMBER: 
-            case DECEMBER: 
-                return true;
-            default: 
-                return false;
-        }
-
-    }
-
-    /**
-     * Returns the quarter for the specified month.
-     *
-     * @param code  the month code (1-12).
-     *
-     * @return the quarter that the month belongs to.
-     */
-    public static int monthCodeToQuarter(final int code) {
-
-        switch(code) {
-            case JANUARY: 
-            case FEBRUARY: 
-            case MARCH: return 1;
-            case APRIL: 
-            case MAY: 
-            case JUNE: return 2;
-            case JULY: 
-            case AUGUST: 
-            case SEPTEMBER: return 3;
-            case OCTOBER: 
-            case NOVEMBER: 
-            case DECEMBER: return 4;
-            default: throw new IllegalArgumentException(
-                "SerialDate.monthCodeToQuarter: invalid month code.");
-        }
-
-    }
-
-    /**
-     * Returns a string representing the supplied month.
-     * <P>
-     * The string returned is the long form of the month name taken from the 
-     * default locale.
-     *
-     * @param month  the month.
-     *
-     * @return a string representing the supplied month.
-     */
-    public static String monthCodeToString(final int month) {
-
-        return monthCodeToString(month, false);
-
-    }
-
-    /**
-     * Returns a string representing the supplied month.
-     * <P>
-     * The string returned is the long or short form of the month name taken 
-     * from the default locale.
-     *
-     * @param month  the month.
-     * @param shortened  if <code>true</code> return the abbreviation of the 
-     *                   month.
-     *
-     * @return a string representing the supplied month.
-     */
-    public static String monthCodeToString(final int month, 
-                                           final boolean shortened) {
-
-        // check arguments...
-        if (!isValidMonthCode(month)) {
-            throw new IllegalArgumentException(
-                "SerialDate.monthCodeToString: month outside valid range.");
-        }
-
-        final String[] months;
-
-        if (shortened) {
-            months = DATE_FORMAT_SYMBOLS.getShortMonths();
-        }
-        else {
-            months = DATE_FORMAT_SYMBOLS.getMonths();
-        }
-
-        return months[month - 1];
-
-    }
-
-    /**
-     * Converts a string to a month code.
-     * <P>
-     * This method will return one of the constants JANUARY, FEBRUARY, ..., 
-     * DECEMBER that corresponds to the string.  If the string is not 
-     * recognised, this method returns -1.
-     *
-     * @param s  the string to parse.
-     *
-     * @return <code>-1</code> if the string is not parseable, the month of the
-     *         year otherwise.
-     */
-    public static int stringToMonthCode(String s) {
-        String trimmedInput = s.trim();
-        // first try parsing the string as an integer (1-12)...
-        try {
-            return Integer.parseInt(trimmedInput);
-        } catch (NumberFormatException e) {
-            // suppress
-        }
-
-        String[] shortMonthNames = DATE_FORMAT_SYMBOLS.getShortMonths();
-        String[] monthNames = DATE_FORMAT_SYMBOLS.getMonths();
-
-        // now search through the month names...
-        for (int i = 0; i < monthNames.length; i++) {
-            if (shortMonthNames[i].equals(trimmedInput) || monthNames[i].equals(trimmedInput)) {
-                return i + 1;
-            }
-        }
-
-        return -1;
-
-    }
-
-    /**
      * Returns true if the supplied integer code represents a valid 
      * week-in-the-month, and false otherwise.
      *
-     * @param code  the code being checked for validity.
+     * @param weekInMonthCode  the code being checked for validity.
      * @return <code>true</code> if the supplied integer code represents a 
      *         valid week-in-the-month.
      */
-    public static boolean isValidWeekInMonthCode(int code) {
-        switch(code) {
-            case FIRST_WEEK_IN_MONTH: 
-            case SECOND_WEEK_IN_MONTH: 
-            case THIRD_WEEK_IN_MONTH: 
-            case FOURTH_WEEK_IN_MONTH: 
-            case LAST_WEEK_IN_MONTH: return true;
-            default: return false;
-        }
-
+    public static boolean isValidWeekInMonthCode(int weekInMonthCode) {
+        return weekInMonthCode >= 0 && weekInMonthCode <= FOURTH_WEEK_IN_MONTH;
     }
 
     /**
-     * Determines whether or not the specified year is a leap year.
-     *
      * @param year  the year (in the range 1900 to 9999).
-     *
-     * @return <code>true</code> if the specified year is a leap year.
+     * @return {@code true} if the specified year is a leap year.
      */
     public static boolean isLeapYear(int year) {
+        checkValidYear(year);
         return (year % 4) == 0 && ((year % 400) == 0 || (year % 100) != 0);
     }
 
@@ -461,7 +355,7 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      */
     public static int lastDayOfMonth(int month, int year) {
         int result = LAST_DAY_OF_MONTH[month];
-        if (month == FEBRUARY && isLeapYear(year)) {
+        if (month == FEBRUARY.getMonthCode() && isLeapYear(year)) {
             return result + 1;
         }
 
@@ -674,13 +568,16 @@ public abstract class SerialDate implements Comparable<SerialDate>,
      *
      * @param day  the day (1-31).
      * @param month  the month (1-12).
-     * @param yyyy  the year (in the range 1900 to 9999).
+     * @param year  the year (in the range 1900 to 9999).
      *
      * @return An instance of {@link SerialDate}.
      */
-    public static SerialDate createInstance(final int day, final int month, 
-                                            final int yyyy) {
-        return new SpreadsheetDate(day, month, yyyy);
+    public static SerialDate createInstance(int day, int month, int year) {
+        return new SpreadsheetDate(day, month, year);
+    }
+
+    public static SerialDate createInstance(int day, Month month, int year) {
+        return new SpreadsheetDate(day, month, year);
     }
 
     /**
@@ -885,6 +782,6 @@ public abstract class SerialDate implements Comparable<SerialDate>,
 
     @Override
     public String toString() {
-        return getDayOfMonth() + "-" + SerialDate.monthCodeToString(getMonth()) + "-" + getYear();
+        return getDayOfMonth() + "-" + Month.monthCodeToLongName(getMonth()) + "-" + getYear();
     }
 }

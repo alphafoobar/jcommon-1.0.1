@@ -45,7 +45,7 @@
 
 package org.jfree.date.rule;
 
-import org.jfree.date.MonthConstants;
+import org.jfree.date.Month;
 import org.jfree.date.SerialDate;
 
 /**
@@ -69,7 +69,7 @@ public class DayAndMonthRule extends AnnualDateRule {
      * Default constructor: builds a DayAndMonthRule for 1 January.
      */
     public DayAndMonthRule() {
-        this(1, MonthConstants.JANUARY);
+        this(1, Month.JANUARY.getMonthCode());
     }
 
     /**
@@ -136,17 +136,11 @@ public class DayAndMonthRule extends AnnualDateRule {
      *
      * @param month  the month for this rule.
      */
-    public void setMonth(final int month) {
-        checkValidMonth(month);
+    public void setMonth(int month) {
+        Month.checkValidMonth(month);
 
         // make the change...
         this.month = month;
-    }
-
-    private void checkValidMonth(int month) {
-        if (!SerialDate.isValidMonthCode(month)) {
-            throw new IllegalArgumentException("DayAndMonthRule(): month code not valid.");
-        }
     }
 
     /**
