@@ -394,7 +394,7 @@ public class SerialDateUtilities {
      * @param end the end date.
      * @return the number of days between the two dates, assuming the 30E/360 day-count convention.
      */
-    public static int dayCount30E(final SerialDate start, final SerialDate end) {
+    public static int dayCount30E(@Nonnull SerialDate start, @Nonnull SerialDate end) {
         return simpleDayCount(start.getDayOfMonth() > 30 ? 30 : start.getDayOfMonth(),
             start.getMonth(), start.getYear(),
             end.getDayOfMonth() > 30 ? 30 : end.getDayOfMonth(),
@@ -434,8 +434,7 @@ public class SerialDateUtilities {
         int endYear = end.getYear();
         for (int year = startYear; year <= endYear; year++) {
             if (isLeapYear(year)) {
-                SerialDate feb29 = SpreadsheetDate
-                    .createInstance(29, Month.FEBRUARY, year);
+                SerialDate feb29 = SpreadsheetDate.createInstance(29, Month.FEBRUARY, year);
                 if (feb29.isInRange(start, end, SerialDate.INCLUDE_SECOND)) {
                     count++;
                 }

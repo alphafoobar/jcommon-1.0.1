@@ -45,7 +45,6 @@ package org.jfree.date;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SerialDateUtilitiesTests {
@@ -119,25 +118,37 @@ public class SerialDateUtilitiesTests {
     }
 
     @Test
-    public void testCountFeb29s_onOneDay() {
+    public void testCount30EFeb29s_onOneDay() {
         SerialDate start = SpreadsheetDate.createInstance(29, Month.FEBRUARY, 2000);
         SerialDate end = SpreadsheetDate.createInstance(29, Month.FEBRUARY, 2000);
         assertEquals(0, SerialDateUtilities.dayCount30E(start, end));
     }
 
     @Test
-    @Ignore // Expected 1 got 88
-    public void testCountFeb29s_inAFewDays() {
+    public void testCount30EFeb29s_inAFewDays() {
         SerialDate start = SpreadsheetDate.createInstance(1, Month.FEBRUARY, 2000);
         SerialDate end = SpreadsheetDate.createInstance(29, Month.APRIL, 2000);
-        assertEquals(1, SerialDateUtilities.dayCount30E(start, end));
+        assertEquals(88, SerialDateUtilities.dayCount30E(start, end));
     }
 
     @Test
-    @Ignore // Expected 3 got 3688
+    public void testCountFeb29s_onOneDay() {
+        SerialDate start = SpreadsheetDate.createInstance(29, Month.FEBRUARY, 2000);
+        SerialDate end = SpreadsheetDate.createInstance(29, Month.APRIL, 2000);
+        assertEquals(0, SerialDateUtilities.countFeb29s(start, end));
+    }
+
+    @Test
+    public void testCountFeb29s_inAFewYDays() {
+        SerialDate start = SpreadsheetDate.createInstance(1, Month.FEBRUARY, 2000);
+        SerialDate end = SpreadsheetDate.createInstance(29, Month.APRIL, 2000);
+        assertEquals(1, SerialDateUtilities.countFeb29s(start, end));
+    }
+
+    @Test
     public void testCountFeb29s_inAFewYears() {
         SerialDate start = SpreadsheetDate.createInstance(1, Month.FEBRUARY, 2000);
         SerialDate end = SpreadsheetDate.createInstance(29, Month.APRIL, 2010);
-        assertEquals(3, SerialDateUtilities.dayCount30E(start, end));
+        assertEquals(3, SerialDateUtilities.countFeb29s(start, end));
     }
 }
