@@ -43,8 +43,12 @@
 
 package org.jfree.date.rule;
 
+import static org.jfree.date.SerialDate.FOLLOWING;
+import static org.jfree.date.SerialDate.NEAREST;
+import static org.jfree.date.SerialDate.PRECEDING;
+import static org.jfree.date.SerialDateUtilities.checkValidYear;
+
 import org.jfree.date.SerialDate;
-import org.jfree.date.SerialDateImpl;
 
 /**
  * An annual date rule that returns a date for each year based on (a) a
@@ -73,7 +77,7 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
      * Default constructor - builds a rule for the Monday following 1 January.
      */
     public RelativeDayOfWeekRule() {
-        this(new DayAndMonthRule(), SerialDateImpl.MONDAY, SerialDateImpl.FOLLOWING);
+        this(new DayAndMonthRule(), SerialDate.MONDAY, SerialDate.FOLLOWING);
     }
 
     /**
@@ -180,23 +184,15 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
         SerialDate base = this.dateRule.getDate(year);
         if (base != null) {
             switch (this.relative) {
-                case (SerialDateImpl.PRECEDING):
+                case (PRECEDING):
                     return base.getPreviousDayOfWeek(this.dayOfWeek);
-                case (SerialDateImpl.NEAREST):
-                    return SerialDateImpl.getNearestDayOfWeek(this.dayOfWeek, base);
-                case (SerialDateImpl.FOLLOWING):
+                case (NEAREST):
+                    return base.getNearestDayOfWeek(this.dayOfWeek);
+                case (FOLLOWING):
                     return base.getFollowingDayOfWeek(this.dayOfWeek);
             }
         }
         return null;
-    }
-
-    private void checkValidYear(int year) {
-        if ((year < SerialDateImpl.MINIMUM_YEAR_SUPPORTED)
-            || (year > SerialDateImpl.MAXIMUM_YEAR_SUPPORTED)) {
-            throw new IllegalArgumentException(
-                "RelativeDayOfWeekRule.getDate(): year outside valid range.");
-        }
     }
 
 }

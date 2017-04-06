@@ -100,7 +100,7 @@ public class SerialDateUtilities {
         return day < 1 || day > lastDayOfMonth(month, year);
     }
 
-    static void checkValidYear(int year) {
+    public static void checkValidYear(int year) {
         if (isValidYear(year)) {
             throw new IllegalArgumentException("The 'year' must be in range "
                 + MINIMUM_YEAR_SUPPORTED + " to" + MAXIMUM_YEAR_SUPPORTED);
@@ -227,13 +227,8 @@ public class SerialDateUtilities {
         return result;
     }
 
-    static int calculateDateAdjustment(int targetWeekday, SerialDate base) {
-        int baseDOW = base.calculateDayOfWeek();
-        int minAdjustment = Math.min(0, targetWeekday - baseDOW);
-        if (baseDOW > targetWeekday) {
-            return minAdjustment;
-        }
-        return minAdjustment - 7;
+    static int calculateDifference(int weekday, int targetWeekday) {
+        return targetWeekday - weekday;
     }
 
     /**
@@ -246,15 +241,15 @@ public class SerialDateUtilities {
      */
     public static String weekInMonthToString(int count) {
         switch (count) {
-            case SerialDateImpl.FIRST_WEEK_IN_MONTH:
+            case SerialDate.FIRST_WEEK_IN_MONTH:
                 return "First";
-            case SerialDateImpl.SECOND_WEEK_IN_MONTH:
+            case SerialDate.SECOND_WEEK_IN_MONTH:
                 return "Second";
-            case SerialDateImpl.THIRD_WEEK_IN_MONTH:
+            case SerialDate.THIRD_WEEK_IN_MONTH:
                 return "Third";
-            case SerialDateImpl.FOURTH_WEEK_IN_MONTH:
+            case SerialDate.FOURTH_WEEK_IN_MONTH:
                 return "Fourth";
-            case SerialDateImpl.LAST_WEEK_IN_MONTH:
+            case SerialDate.LAST_WEEK_IN_MONTH:
                 return "Last";
             default:
                 return "SerialDate.weekInMonthToString(): invalid code.";
@@ -272,11 +267,11 @@ public class SerialDateUtilities {
      */
     public static String relativeToString(final int relative) {
         switch (relative) {
-            case SerialDateImpl.PRECEDING:
+            case SerialDate.PRECEDING:
                 return "Preceding";
-            case SerialDateImpl.NEAREST:
+            case SerialDate.NEAREST:
                 return "Nearest";
-            case SerialDateImpl.FOLLOWING:
+            case SerialDate.FOLLOWING:
                 return "Following";
             default:
                 return "ERROR : Relative To String";
@@ -291,19 +286,19 @@ public class SerialDateUtilities {
      */
     public int stringToWeekday(String s) {
         if (s.equals(WEEKDAYS[Calendar.SATURDAY])) {
-            return SerialDateImpl.SATURDAY;
+            return SerialDate.SATURDAY;
         } else if (s.equals(WEEKDAYS[Calendar.SUNDAY])) {
-            return SerialDateImpl.SUNDAY;
+            return SerialDate.SUNDAY;
         } else if (s.equals(WEEKDAYS[Calendar.MONDAY])) {
-            return SerialDateImpl.MONDAY;
+            return SerialDate.MONDAY;
         } else if (s.equals(WEEKDAYS[Calendar.TUESDAY])) {
-            return SerialDateImpl.TUESDAY;
+            return SerialDate.TUESDAY;
         } else if (s.equals(WEEKDAYS[Calendar.WEDNESDAY])) {
-            return SerialDateImpl.WEDNESDAY;
+            return SerialDate.WEDNESDAY;
         } else if (s.equals(WEEKDAYS[Calendar.THURSDAY])) {
-            return SerialDateImpl.THURSDAY;
+            return SerialDate.THURSDAY;
         } else {
-            return SerialDateImpl.FRIDAY;
+            return SerialDate.FRIDAY;
         }
 
     }
@@ -513,7 +508,7 @@ public class SerialDateUtilities {
             if (isLeapYear(year)) {
                 SerialDate feb29 = SpreadsheetDate
                     .createInstance(29, Month.FEBRUARY, year);
-                if (feb29.isInRange(start, end, SerialDateImpl.INCLUDE_SECOND)) {
+                if (feb29.isInRange(start, end, SerialDate.INCLUDE_SECOND)) {
                     count++;
                 }
             }

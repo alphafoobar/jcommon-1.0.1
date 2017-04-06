@@ -112,6 +112,15 @@ public interface SerialDate extends Comparable<SerialDate> {
     int FOLLOWING = 1;
 
     /**
+     * Returns the date that falls on the specified day-of-the-week and is
+     * CLOSEST to the base date.
+     *
+     * @param targetDOW a code for the target day-of-the-week.
+     * @return the date that falls on the specified day-of-the-week and is CLOSEST to the base date.
+     */
+    SerialDate getNearestDayOfWeek(int targetDOW);
+
+    /**
      * Returns the earliest date that falls on the specified day-of-the-week
      * and is AFTER the base date.
      *

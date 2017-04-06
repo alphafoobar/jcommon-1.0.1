@@ -92,24 +92,92 @@ public class SerialDateTests {
 
     @Test
     public void testMondayPrecedingFriday9Nov2001() {
-        SerialDate mondayBefore = this.nov9Y2001.getPreviousDayOfWeek(
-            SpreadsheetDate.MONDAY
-        );
-        assertEquals(5, mondayBefore.getDayOfMonth());
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.MONDAY);
+        assertEquals(5, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testTuesdayPrecedingFriday9Nov2001() {
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.TUESDAY);
+        assertEquals(6, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testWednesdayPrecedingFriday9Nov2001() {
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.WEDNESDAY);
+        assertEquals(7, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testThursdayPrecedingFriday9Nov2001() {
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.THURSDAY);
+        assertEquals(8, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testFridayPrecedingFriday9Nov2001() {
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.FRIDAY);
+        assertEquals(2, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testSaturdayPrecedingFriday9Nov2001() {
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.SATURDAY);
+        assertEquals(3, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testSundayPrecedingFriday9Nov2001() {
+        SerialDate before = this.nov9Y2001.getPreviousDayOfWeek(SpreadsheetDate.SUNDAY);
+        assertEquals(4, before.getDayOfMonth());
+    }
+
+    @Test
+    public void testFridayFollowingFriday9Nov2001() {
+        SerialDate after = nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.FRIDAY);
+        assertEquals(16, after.getDayOfMonth());
+    }
+
+    @Test
+    public void testSaturdayFollowingFriday9Nov2001() {
+        SerialDate after = nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.SATURDAY);
+        assertEquals(10, after.getDayOfMonth());
+    }
+
+    @Test
+    public void testSundayFollowingFriday9Nov2001() {
+        SerialDate after = nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.SUNDAY);
+        assertEquals(11, after.getDayOfMonth());
     }
 
     @Test
     public void testMondayFollowingFriday9Nov2001() {
-        SerialDate mondayAfter = this.nov9Y2001.getFollowingDayOfWeek(
-            SpreadsheetDate.MONDAY
-        );
+        SerialDate mondayAfter = this.nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.MONDAY);
         assertEquals(12, mondayAfter.getDayOfMonth());
     }
 
     @Test
+    public void testTuesdayFollowingFriday9Nov2001() {
+        SerialDate after = nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.TUESDAY);
+        assertEquals(13, after.getDayOfMonth());
+    }
+
+    @Test
+    public void testWednesdayFollowingFriday9Nov2001() {
+        SerialDate after = nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.WEDNESDAY);
+        assertEquals(14, after.getDayOfMonth());
+    }
+
+    @Test
+    public void testThursdayFollowingFriday9Nov2001() {
+        SerialDate after = nov9Y2001.getFollowingDayOfWeek(SpreadsheetDate.THURSDAY);
+        assertEquals(15, after.getDayOfMonth());
+    }
+
+    @Test
     public void testMondayNearestFriday9Nov2001() {
-        SerialDate mondayNearest = SpreadsheetDate.getNearestDayOfWeek(
-            SpreadsheetDate.MONDAY, this.nov9Y2001
+        SerialDate mondayNearest = this.nov9Y2001.getNearestDayOfWeek(
+            SpreadsheetDate.MONDAY
         );
         assertEquals(12, mondayNearest.getDayOfMonth());
     }
@@ -117,8 +185,8 @@ public class SerialDateTests {
     @Test
     public void testMondayNearest22Jan1970() {
         SerialDate jan22Y1970 = SpreadsheetDate.createInstance(22, Month.JANUARY, 1970);
-        SerialDate mondayNearest = SerialDateImpl
-            .getNearestDayOfWeek(SpreadsheetDate.MONDAY, jan22Y1970);
+        SerialDate mondayNearest = jan22Y1970
+            .getNearestDayOfWeek(SpreadsheetDate.MONDAY);
         assertEquals(19, mondayNearest.getDayOfMonth());
     }
 

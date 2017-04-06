@@ -20,6 +20,7 @@
  */
 package org.jfree.date;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,7 +39,7 @@ import javax.annotation.Nonnull;
  *
  * @author David Gilbert
  */
-public class SpreadsheetDate extends SerialDateImpl {
+public class SpreadsheetDate implements Serializable, SerialDate {
     private static final long serialVersionUID = 0L;
 
     private int serial;
@@ -63,7 +64,7 @@ public class SpreadsheetDate extends SerialDateImpl {
         this.serial = serial;
 
         // the day-month-year needs to be synchronised with the serial number...
-        calcDayMonthYearFromSerial();
+        calculateAndSetDayMonthYearFromSerial();
     }
 
     public static SerialDate createInstance(int day, int month, int year) {
@@ -121,13 +122,30 @@ public class SpreadsheetDate extends SerialDateImpl {
     public SerialDate getFollowingDayOfWeek(int targetWeekday) {
         SerialDateUtilities.checkValidDayOfWeek(targetWeekday);
 
-        // TODO use calculateDateAdjustment
+        int difference = -SerialDateUtilities
+            .calculateDifference(targetWeekday, calculateDayOfWeek());
+        return addDays(difference <= 0 ? difference + 7 : difference);
+    }
+
+    @Override
+    public SerialDate getNearestDayOfWeek(int targetWeekday) {
+        SerialDateUtilities.checkValidDayOfWeek(targetWeekday);
+
         // find the date...
-        int baseDOW = calculateDayOfWeek();
-        if (baseDOW > targetWeekday) {
-            return addDays(7 + Math.min(0, targetWeekday - baseDOW));
+        int adjust = -Math.abs(targetWeekday - calculateDayOfWeek());
+        if (adjust <= -4) {
+            adjust = 7 + adjust;
         }
-        return addDays(Math.max(0, targetWeekday - baseDOW));
+        return addDays(adjust);
+    }
+
+    @Override
+    public SerialDate getPreviousDayOfWeek(int targetWeekday) {
+        SerialDateUtilities.checkValidDayOfWeek(targetWeekday);
+
+        int difference = SerialDateUtilities
+            .calculateDifference(calculateDayOfWeek(), targetWeekday);
+        return addDays(difference >= 0 ? difference - 7 : difference);
     }
 
     @Override
@@ -195,7 +213,7 @@ public class SpreadsheetDate extends SerialDateImpl {
 
     @Override
     public boolean isInRange(@Nonnull SerialDate dateFrom, @Nonnull SerialDate dateTo) {
-        return isInRange(dateFrom, dateTo, SerialDateImpl.INCLUDE_BOTH);
+        return isInRange(dateFrom, dateTo, INCLUDE_BOTH);
     }
 
     @Override
@@ -204,15 +222,15 @@ public class SpreadsheetDate extends SerialDateImpl {
         int start = dateFrom.toSerial();
         int end = dateTo.toSerial();
 
-        if (inclusionRule == SerialDateImpl.INCLUDE_BOTH) {
+        if (inclusionRule == INCLUDE_BOTH) {
             return serial >= start && serial <= end;
         }
 
-        if (inclusionRule == SerialDateImpl.INCLUDE_FIRST) {
+        if (inclusionRule == INCLUDE_FIRST) {
             return serial >= start && serial < end;
         }
 
-        if (inclusionRule == SerialDateImpl.INCLUDE_SECOND) {
+        if (inclusionRule == INCLUDE_SECOND) {
             return serial > start && serial <= end;
         }
 
@@ -226,7 +244,7 @@ public class SpreadsheetDate extends SerialDateImpl {
     }
 
     private static int calculateAggregatedDays(int month, int year) {
-        int aggregatedDays = SerialDateImpl.AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
+        int aggregatedDays = AGGREGATE_DAYS_TO_END_OF_PRECEDING_MONTH[month];
         if (month > Month.FEBRUARY.getMonthCode() && SerialDateUtilities.isLeapYear(year)) {
             aggregatedDays = aggregatedDays + 1;
         }
@@ -243,7 +261,7 @@ public class SpreadsheetDate extends SerialDateImpl {
         return MINIMUM_YEAR_SUPPORTED + (days / 365);
     }
 
-    private void calcDayMonthYearFromSerial() {
+    private void calculateAndSetDayMonthYearFromSerial() {
         // get the year from the serial date
         int days = this.serial - SERIAL_LOWER_BOUND;
 
@@ -299,6 +317,11 @@ public class SpreadsheetDate extends SerialDateImpl {
             return s.serial == serial;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return getDayOfMonth() + "-" + Month.monthCodeToLongName(getMonth()) + "-" + getYear();
     }
 
 }

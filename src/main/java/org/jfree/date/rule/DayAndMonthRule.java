@@ -47,7 +47,6 @@ package org.jfree.date.rule;
 
 import org.jfree.date.Month;
 import org.jfree.date.SerialDate;
-import org.jfree.date.SerialDateImpl;
 import org.jfree.date.SpreadsheetDate;
 
 /**
@@ -114,7 +113,7 @@ public class DayAndMonthRule extends AnnualDateRule {
     }
 
     private void checkValidDayOfMonth(int dayOfMonth) {
-        if (dayOfMonth < 1 || dayOfMonth > SerialDateImpl.LAST_DAY_OF_MONTH[this.month]) {
+        if (dayOfMonth < 1 || dayOfMonth > SerialDate.LAST_DAY_OF_MONTH[this.month]) {
             throw new IllegalArgumentException(
                 "DayAndMonthRule(): dayOfMonth outside valid range.");
         }
