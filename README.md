@@ -2,4 +2,4 @@
 
 This is a java kata, from a clean coder course. 
 
-A solution in solutions branch.
+A solution in [solution](https://github.com/alphafoobar/jcommon-1.0.1/tree/solution) branch.
