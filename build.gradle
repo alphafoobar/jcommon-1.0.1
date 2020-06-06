@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id "com.github.spotbugs" version "4.0.1"
+}
+
+version = '1.0.2-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_14
+targetCompatibility = JavaVersion.VERSION_14
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+repositories {
+    mavenCentral()
+}
+
+spotbugs {
+    toolVersion.set('4.0.0')
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+        csv.enabled false
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    finalizedBy jacocoTestReport
+}
+
+dependencies {
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.0.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+    implementation group: 'com.google.flogger', name: 'flogger', version: '0.4'
+    implementation group: 'com.google.flogger', name: 'flogger-system-backend', version: '0.4'
+
+    testImplementation group: 'com.google.guava', name: 'guava-testlib', version: '28.2-jre'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.0'
+}

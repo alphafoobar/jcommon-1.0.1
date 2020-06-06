@@ -42,7 +42,8 @@ import javax.annotation.Nonnull;
 public class SpreadsheetDate implements Serializable, SerialDate {
     private static final long serialVersionUID = 0L;
 
-    private int serial;
+    private final int serial;
+
     private int day;
     private int month;
     private int year;
@@ -50,12 +51,12 @@ public class SpreadsheetDate implements Serializable, SerialDate {
     private SpreadsheetDate(int day, Month month, int year) {
         SerialDateUtilities.validate(day, month.getMonthCode(), year);
 
+        // the serial number needs to be synchronised with the day-month-year...
+        this.serial = calculateSerial(day, month.getMonthCode(), year);
+
         this.year = year;
         this.month = month.getMonthCode();
         this.day = day;
-
-        // the serial number needs to be synchronised with the day-month-year...
-        this.serial = calculateSerial(day, month.getMonthCode(), year);
     }
 
     private SpreadsheetDate(int serial) {
@@ -157,6 +158,7 @@ public class SpreadsheetDate implements Serializable, SerialDate {
     public Date toDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
+        //noinspection MagicConstant
         calendar.set(getYear(), getMonth() - 1, getDayOfMonth(), 0, 0, 0);
         return calendar.getTime();
     }
@@ -217,24 +219,20 @@ public class SpreadsheetDate implements Serializable, SerialDate {
     }
 
     @Override
-    public boolean isInRange(@Nonnull SerialDate dateFrom, @Nonnull SerialDate dateTo,
-        int inclusionRule) {
-        int start = dateFrom.toSerial();
-        int end = dateTo.toSerial();
-
+    public boolean isInRange(@Nonnull SerialDate dateFrom, @Nonnull SerialDate dateTo, int inclusionRule) {
         if (inclusionRule == INCLUDE_BOTH) {
-            return serial >= start && serial <= end;
+            return isOnOrAfter(dateFrom) && isOnOrBefore(dateTo);
         }
 
         if (inclusionRule == INCLUDE_FIRST) {
-            return serial >= start && serial < end;
+            return isOnOrAfter(dateFrom) && isBefore(dateTo);
         }
 
         if (inclusionRule == INCLUDE_SECOND) {
-            return serial > start && serial <= end;
+            return isAfter(dateFrom) && isOnOrBefore(dateTo);
         }
 
-        return serial > start && serial < end;
+        return isAfter(dateFrom) && isBefore(dateTo);
     }
 
     private static int calculateSerial(int day, int month, int year) {

@@ -1,1 +1,3 @@
+[![Build Status](https://travis-ci.com/alphafoobar/jcommon-1.0.1.svg?branch=master)](https://travis-ci.com/alphafoobar/jcommon-1.0.1) [![codecov](https://codecov.io/gh/alphafoobar/jcommon-1.0.1/branch/master/graph/badge.svg)](https://codecov.io/gh/alphafoobar/jcommon-1.0.1) [![Known Vulnerabilities](https://snyk.io/test/github/alphafoobar/jcommon-1.0.1/badge.svg)](https://snyk.io/test/github/alphafoobar/jcommon-1.0.1)
+
 # jcommon-1.0.1

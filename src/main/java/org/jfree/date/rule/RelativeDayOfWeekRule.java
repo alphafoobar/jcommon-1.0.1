@@ -118,16 +118,15 @@ public class RelativeDayOfWeekRule extends AnnualDateRule {
         checkValidYear(year);
 
         // calculate the date...
-        SerialDate base = this.dateRule.getDate(year);
-        switch (this.relative) {
-            case (PRECEDING):
-                return base.getPreviousDayOfWeek(this.dayOfWeek);
-            case (NEAREST):
-                return base.getNearestDayOfWeek(this.dayOfWeek);
-            case (FOLLOWING):
-                return base.getFollowingDayOfWeek(this.dayOfWeek);
-        }
-        return base;
+        return switch (this.relative) {
+            case (PRECEDING) -> base(year).getPreviousDayOfWeek(this.dayOfWeek);
+            case (NEAREST) -> base(year).getNearestDayOfWeek(this.dayOfWeek);
+            case (FOLLOWING) -> base(year).getFollowingDayOfWeek(this.dayOfWeek);
+            default -> base(year);
+        };
     }
 
+    private SerialDate base(int year) {
+        return this.dateRule.getDate(year);
+    }
 }

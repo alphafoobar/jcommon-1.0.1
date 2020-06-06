@@ -264,8 +264,7 @@ public interface SerialDate extends Comparable<SerialDate> {
      *
      * @return A boolean.
      */
-    boolean isInRange(SerialDate d1, SerialDate d2,
-        int include);
+    boolean isInRange(SerialDate d1, SerialDate d2, int include);
 
     SerialDate addDays(int days);
 
